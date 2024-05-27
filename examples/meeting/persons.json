@@ -1,0 +1,22 @@
+{
+    "participants" : [
+        {
+            "name": "Jeff",
+            "position_title": "Chief Technology Officer",
+            "detailed_description": "As the Chief Technology Officer, Jeff oversees all technical aspects and technological resources of the company. He is responsible for aligning the company's technology strategy with its business goals, ensuring the development and implementation of new tech initiatives. He leads the R&D teams and manages the technology roadmap, focusing on innovation and efficiency to keep the company competitive in AI solutions.",
+            "email_address": "jeff@techaihealth.com"
+        },
+        {
+            "name": "Julia",
+            "position_title": "Product Manager",
+            "detailed_description": "Julia manages the lifecycle of products from concept to launch. She is pivotal in integrating customer feedback into product development to ensure the products meet market needs. Julia works closely with cross-functional teams, including engineering, marketing, and sales, to deliver products that align with business strategies. Her role involves prioritizing product features, defining product visions, and ensuring that the roadmaps reflect customer demands and business objectives.",
+            "email_address": "julia@techaihealth.com"
+        },
+        {
+            "name": "Barbara",
+            "position_title": "Director of Marketing",
+            "detailed_description": "Barbara is the head of the Marketing Department, tasked with developing effective marketing strategies and campaigns for the company’s products. Her role includes market analysis, competitor analysis, and campaign management to ensure the successful launch and sustained market performance of products. She coordinates with product teams to align marketing strategies with product timelines and features, focusing on creating compelling value propositions and reaching the target audience effectively.",
+            "email_address": "barbara@techaihealth.com"
+        }
+    ]
+}
