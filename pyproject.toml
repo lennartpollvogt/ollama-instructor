@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ollama-instructor"
-version = "0.1.1"
+version = "0.1.2"
 description = "Instruct and validate structured outputs from LLMs with Ollama."
 authors = ["Lennart Pollvogt"]
 license = "MIT"

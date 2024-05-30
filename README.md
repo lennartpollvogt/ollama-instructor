@@ -39,7 +39,7 @@ Here are quick examples to get you started with `ollama-instructor`:
 
 **chat completion**:
 ```python
-from ollama_instructor import OllamaInstructorClient
+from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
 from pydantic import BaseModel
 
 class Person(BaseModel):
@@ -67,7 +67,7 @@ Output:
 
 **chat completion with streaming**:
 ```python
-from ollama_instructor import OllamaInstructorClient
+from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
 from pydantic import BaseModel
 
 class Person(BaseModel):

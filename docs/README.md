@@ -239,7 +239,7 @@ Very good! But, not exactly what I wanted, since I didn't asked for an array of 
 That's why `ollama-instrcutor` makes advantage of **Pydantic**. With **Pydantic** it is quite convenient for developers to create `JSON` schemas and validate them. It is also possible to add some customized validations to extend **Pydantics** built-in validation functionality. And additionally, you don't have to specify a system prompt, as `ollama-instructor` will you the **Pydantic** model to instruct and validate the LLM.
 
 ```Python
-from ollama_instructor import OllamaInstructorClient
+from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
 from pydantic import BaseModel, Field
 from enum import Enum
 from datetime import datetime
@@ -307,7 +307,7 @@ If you want to use your own system prompts, you can do so. `ollama-instructor` w
 
 Here is an example on how you could use your own system prompt to instruct the LLM:
 ```Python
-from ollama_instructor import OllamaInstructorClient
+from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
 from pydantic import BaseModel, Field
 from enum import Enum
 from datetime import datetime

@@ -47,7 +47,7 @@ class ListOfPerson(BaseModel):
     persons: List[Person]
 
 client = OllamaInstructorClient(
-    host='192.168.0.171:11434'
+    host='https://localhost:11434'
 )
 
 response = client.chat_completion(
