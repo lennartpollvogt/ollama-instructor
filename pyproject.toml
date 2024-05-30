@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "ollama-instructor"
+version = "0.1.1"
+description = "Instruct and validate structured outputs from LLMs with Ollama."
+authors = ["Lennart Pollvogt"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/lennartpollvogt/ollama-instructor"
+repository = "https://github.com/lennartpollvogt/ollama-instructor"
+documentation = "https://github.com/lennartpollvogt/ollama-instructor/tree/main/docs"
+keywords = ["ollama", "pydantic", "validation", "json-schema", "json", "instructor", "prompting", "local-llm", "llm"]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+ollama = "^0.2.0"
+pydantic = "^2.7.1"
+partial-json-parser = "^0.2.0"
+promptools = "^0.1.3.2"
+fastapi = "^0.110.2"
+rich = "^13.7.1"
+icecream = "^2.1.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
