@@ -39,7 +39,7 @@ class OllamaInstructorClient:
     
     Example:
     ```Python
-    from ollama_instructor import OllamaInstructorClient
+    from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
     from pydantic import BaseModel
 
     class Person(BaseModel):
@@ -99,7 +99,7 @@ class OllamaInstructorClient:
 
         Example:
             ```Python
-            from ollama_instructor import OllamaInstructorClient
+            from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
             from pydantic import BaseModel
             from enum import Enum
 
@@ -229,7 +229,7 @@ class OllamaInstructorClient:
 
         Example:
             ```Python
-            from ollama_instructor import OllamaInstructorClient
+            from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
             from pydantic import BaseModel
             from enum import Enum
 
@@ -339,90 +339,3 @@ class OllamaInstructorClient:
                 ic(e)
                 raise e
             
-
-    ####################
-    # DEPRECATED
-    ####################
-    def chat_completion_with_stream_old(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', **kwargs) -> Generator[Dict[str, Any], None, None]: 
-        '''
-        ATTENTION: This method is deprecated. Use `chat_completion_with_stream` instead.
-
-
-        Chat with the model and validate the response with the provided Pydantic model.
-
-        **This method is for streaming.** Use `chat_completion` instead.
-
-        Args:
-            pydantic_model (Type[BaseModel]): The Pydantic model for validation.
-            messages (List[Dict[str, Any]]): The chat messages.
-            model (str): The LLM model.
-            retries (int): The number of retries if the response is not valid.
-            format (Literal['', 'json']): The format of the response.
-            **kwargs: Additional arguments to pass to the LLM client of `Ollama`.
-
-        Returns:
-            Generator[Dict[str, Any], None, None]: The generated response.
-
-        Example:
-            ```Python
-            from ollama_instructor import OllamaInstructorClient
-            from pydantic import BaseModel
-            from enum import Enum
-
-            client = OllamaInstructorClient(host='http://localhost:11434')
-
-            class Gender(Enum):
-                MALE = 'male'
-                FEMALE = 'female'
-
-            class Person(BaseModel):
-                name: str
-                age: int
-                gender: Gender
-
-            response = client.chat_completion_with_stream_old(
-                pydantic_model=Person,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': 'Jason is 45 years old.'
-                    }
-                ],
-                model='mistral:7b-instruct',
-            )
-            
-            for chunk in response:
-                print(chunk['message']['content'])
-            # >>> Output example:
-            # {'name': 'Jason', 'age': 45, 'gender': 'male'}
-        '''
-        self.retry_counter = retries
-        if self.retry_counter == retries:
-            messages = self.chat_prompt_manager.create_chat_prompt_for_json(pydantic_model=pydantic_model, messages=messages)
-            self.chat_history = messages
-        expanding_response = ""
-        response = self.ollama_client.chat(
-            model=model,
-            messages=messages,
-            format=format,
-            stream=True,
-            **kwargs
-        )
-        try:
-            ic()
-            for chunk in response:
-                if self.chat_history != []:
-                    self.chat_history.pop(-1)
-                
-                expanding_response += chunk['message']['content']
-                chunk['message']['content'] = expanding_response
-                # Validation block
-                chunk = self.validation_manager.validate_chat_completion_with_stream(chunk=chunk, pydantic_model=pydantic_model)
-                validation_result = self.validation_manager.validate_for_error_message(response=chunk, pydantic_model=pydantic_model)
-                chunk = self.validation_manager.add_error_log_to_final_response(response=chunk, error_message=validation_result, raw_message=expanding_response)
-                # Append chat_history
-                self.chat_history += [chunk['message']]
-                yield chunk
-        except Exception as e:
-            ic()
-            raise e
