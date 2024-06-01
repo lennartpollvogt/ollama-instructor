@@ -2,8 +2,9 @@
 
 `ollama-instructor` is a lightweight Python library that provides a convenient wrapper around the Client of the renowned Ollama repository, extending it with validation features for obtaining valid JSON responses from a Large Language Model (LLM). Utilizing Pydantic, `ollama-instructor` allows users to specify models for JSON schemas and data validation, ensuring that responses from LLMs adhere to the defined schema.
 
-> **Note**: This library has a native support for the Ollamas Python client. If you want to have more flexibility with other providers like Groq, OpenAI, Perplexity and more, have a look into the great library of [instrutor](https://github.com/jxnl/instructor) of Jason Lui.
+> **Note 1**: This library has a native support for the Ollamas Python client. If you want to have more flexibility with other providers like Groq, OpenAI, Perplexity and more, have a look into the great library of [instrutor](https://github.com/jxnl/instructor) of Jason Lui.
 
+> **Note 2**: This library depends on having [Ollama](https://ollama.com) installed and running. For more information, please refer to the official website of Ollama.
 
 ## Features
 
@@ -16,10 +17,11 @@
 - Allow partial responses to be returned by setting the `allow_partial` flag to True. This will try to clean set invalid data within the response and set it to `None`. Unsetted data (not part of the Pydantic model) will be deleted from the response.
 
 `ollama-instructor` can help you to get structured and reliable JSON from local LLMs like:
-- Llama3
+- llama3
 - phi3
 - mistral
-- Gemma
+- gemma
+- ...
 
 `ollama-instructor` can be your starting point to build agents by your self. Have full control over agent flows without relying on complex agent framework.
 
@@ -105,9 +107,9 @@ The `chat_completion` and `chat_completion_with_stream` methods are the main met
 `ollama-instructor` uses `chat_completion` and `chat_completion_with_stream` to expand the `chat` method of `Ollama`. For all available arguments of `chat` see the [Ollama documentation](https://github.com/ollama/ollama).
 
 The following arguments are added to the `chat` method within `chat_completion` and `chat_completion_with_stream`:
-- `pydantic_model`: a `pydantic.BaseModel` class that is used to firstly instruct the LLM with the JSON schema of the `pydantic.BaseModel` and secondly to validate the response of the LLM with the built-in validation of `pydantic`.
+- `pydantic_model`: a class of Pydantic's `BaseModel` class that is used to firstly instruct the LLM with the JSON schema of the `BaseModel` and secondly to validate the response of the LLM with the built-in validation of [Pydantic](https://docs.pydantic.dev/latest/).
 - `retries`: the number of retries if the LLM fails to generate a valid response (default: `3`). If a LLM fails the retry will provide the last response of the LLM with the given `ValidationError` and insructs it to generate a valid response.
-- `allow_partial`: If set to `True` `ollama-instructor` will modify the `pydantic.BaseModel` to allow partial responses. In this case it makes sure to provide the correct instance of the JSON schema but with default or None values. Therefore, it is useful to provide default values within the `pydantic.BaseModel`. With the improvement of this library you will find examples and best practice guides on that topic in the [docs](/docs/) folder.
+- `allow_partial`: If set to `True` `ollama-instructor` will modify the `BaseModel` to allow partial responses. In this case it makes sure to provide the correct instance of the JSON schema but with default or None values. Therefore, it is useful to provide default values within the `BaseModel`. With the improvement of this library you will find examples and best practice guides on that topic in the [docs](/docs/) folder.
 
 
 ## Documentation and examples
