@@ -59,18 +59,18 @@ That's why I tried to create something comparable on my own and came up with `ol
 
 Not all LLMs are suitable for the task of producing JSON. Some LLMs are great for having conversations like in a chat, some are great at coding and some are great to follow instructions. You will discover a lot of LLMs that have been created for different task. The last type of mentioned LLMs are those highly recommended when trying to produce reliable `JSON` with `ollama-instructor`. Here are my favorite LLMs I was using during the development of `ollama-instructor`:
 
-**7b models**:
+**7b and 8b models**:
 - `mistral:7b-instruct`
 - `codellama:7b-instruct`
-- `llama3:7b`
+- `llama3:8b`
 - `openhermes`
 - `gemma:7b-instruct`
 
-**2b models**:
+**2b and 3b models**:
 - `gemma:2b-instruct`
 - `phi3`
 
-> Hint: 2b models run on low performing hardware but you will struggle to get a successful response from them. For easy tasks they are good and fast but when the complexity of the **Pydantic** model increases, you will be forced to be really good in prompting. Nevertheless, **Phi3** is a very capable tiny model!
+> Hint: 2b or 3b models run on low performing hardware but you will struggle to get a successful response from them. For easy tasks they are good and fast but when the complexity of the **Pydantic** model increases, you will be forced to be really good in prompting. Nevertheless, **Phi3** is a very capable tiny model!
 
 You can get more information and download them all from the [**Ollama** models library](https://ollama.com/library).
 
@@ -93,7 +93,7 @@ I would like to have the LLM to create its response in `JSON` in the following s
 
 ```JSON
 {
-    todos: [
+    "todos": [
         {
             "title": "Create presentation",
             "taskDescription": "Create a presentation about the commodity markets in Asia for my boss",
