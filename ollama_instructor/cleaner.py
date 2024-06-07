@@ -6,6 +6,26 @@ import json
 
 from icecream import ic
 
+# TODO: ref
+'''
+NOTE:
+The function "create_partial_model" in the following was created with the research and help of Phind-70b from www.phind.com.
+The research of the Phind system discovered concepts from different sources. A first draft of the function was created by Phind-70b.
+The function was then improved by iterating over the use cases in collaboration with Phind-70b.
+
+For transparency reasons I want to provide the sources:
+- https://github.com/samuelcolvin/pydantic/issues/1673
+- https://stackoverflow.com/questions/64045012/pydantic-input-model-for-partial-updates
+- https://docs.pydantic.dev/latest/concepts/models/
+- https://towardsdatascience.com/write-dry-data-models-with-partials-and-pydantic-b0b13d0eeb3a
+- https://docs.pydantic.dev/1.10/usage/types/
+- https://www.getorchestra.io/guides/pydantic-partial-update-models-in-fastapi-a-tutorial
+- https://fastapi.tiangolo.com/tutorial/response-model/
+- https://github.com/team23/pydantic-partial
+- https://fastapi.tiangolo.com/tutorial/body-updates/
+'''
+
+
 def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
     '''
     Creates a partial Pydantic model that accepts missing fields.
