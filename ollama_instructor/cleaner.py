@@ -6,7 +6,6 @@ import json
 
 from icecream import ic
 
-# TODO: ref
 '''
 NOTE:
 The function "create_partial_model" in the following was created with the research and help of Phind-70b from www.phind.com.
@@ -112,4 +111,3 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
     except Exception as e:
         ic()
         raise e
-    

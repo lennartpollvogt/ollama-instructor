@@ -67,6 +67,53 @@ Output:
 {"name": "Jason", "age": 30}
 ```
 
+**asynchronous chat completion**:
+```python
+from pydantic import BaseModel, ConfigDict
+from enum import Enum
+from typing import List
+import rich
+import asyncio
+
+from ollama_instructor.ollama_instructor_client import OllamaInstructorAsyncClient
+
+class Gender(Enum):
+    MALE = 'male'
+    FEMALE = 'female'
+
+class Person(BaseModel):
+    '''
+    This model defines a person.
+    '''
+    name: str
+    age: int
+    gender: Gender
+    friends: List[str] = []
+
+    model_config = ConfigDict(
+        extra='forbid'
+    )
+
+async def main():
+    client = OllamaInstructorAsyncClient(...)
+    await client.async_init()  # Wichtig: Die asynchrone Initialisierung aufrufen
+
+    response = await client.chat_completion(
+        model='phi3:instruct',
+        pydantic_model=Person,
+        messages=[
+            {
+                'role': 'user',
+                'content': 'Jason is 25 years old. Jason loves to play soccer with his friends Nick and Gabriel. His favorite food is pizza.'
+            }
+        ],
+    )
+    rich.print(response['message']['content'])
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
 **chat completion with streaming**:
 ```python
 from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
@@ -92,9 +139,9 @@ for chunk in response:
     print(chunk['message']['content'])
 ```
 
-## OllamaInstructorClient
+## OllamaInstructorClient and OllamaInstructorAsyncClient
 
-The class `OllamaInstructorClient` is the main class of the `ollama-instructor` library. It is the the wrapper around the `Ollama` client and contains the following arguments:
+The classes `OllamaInstructorClient` and `OllamaInstructorAsyncClient` are the main class of the `ollama-instructor` library. They are the wrapper around the `Ollama` client and contain the following arguments:
 - `host`: the URL of the Ollama server (default: `http://localhost:11434`). See documentation of [Ollama](https://github.com/ollama/ollama)
 - `debug`: a `bool` indicating whether to print debug messages (default: `False`). 
 

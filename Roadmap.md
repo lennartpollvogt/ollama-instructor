@@ -6,12 +6,15 @@ The current features of the `ollama-instructor` library are mentioned in the [RE
 
 **Planned features**:
 
-- [ ] Async client for chat_completion and chat_completion_with_stream
+- [x] Async client
+    - [x] chat_completion
+    - [ ] chat_completion_with_stream
 - [ ] Advanced logging
 
 **General enhancements**:
 - [ ] Add more docs and guides + structure docs
-- [ ] Advanced testing 
+- [x] Advanced testing 
+- [ ] Add more tests
 
 --- 
 > *Note*: I'm still discovering new fields of use cases, so if you have any suggestions or ideas, please feel free to open an issue or pull request. And I would be super happy to have pull requests for example code (see [examples](/examples/)).
