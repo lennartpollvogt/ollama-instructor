@@ -96,7 +96,7 @@ class Person(BaseModel):
 
 async def main():
     client = OllamaInstructorAsyncClient(...)
-    await client.async_init()  # Wichtig: Die asynchrone Initialisierung aufrufen
+    await client.async_init()  # Important: must call this before using the client
 
     response = await client.chat_completion(
         model='phi3:instruct',
@@ -141,7 +141,7 @@ for chunk in response:
 
 ## OllamaInstructorClient and OllamaInstructorAsyncClient
 
-The classes `OllamaInstructorClient` and `OllamaInstructorAsyncClient` are the main class of the `ollama-instructor` library. They are the wrapper around the `Ollama` client and contain the following arguments:
+The classes `OllamaInstructorClient` and `OllamaInstructorAsyncClient` are the main class of the `ollama-instructor` library. They are the wrapper around the `Ollama` (async) client and contain the following arguments:
 - `host`: the URL of the Ollama server (default: `http://localhost:11434`). See documentation of [Ollama](https://github.com/ollama/ollama)
 - `debug`: a `bool` indicating whether to print debug messages (default: `False`). 
 

@@ -234,6 +234,7 @@ class OllamaInstructorClient:
             model (str): The LLM model.
             retries (int): The number of retries if the response is not valid.
             format (Literal['', 'json']): The format of the response.
+            allow_partial (bool): If True, the response can be partial. Otherwise, the response must contain all fields of the Pydantic model. Have in mind that you can get an uncomplete response when set to `True`.
             **kwargs: Additional arguments to pass to the LLM client of `Ollama`.
 
         Returns:
