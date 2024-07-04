@@ -25,6 +25,11 @@
 
 `ollama-instructor` can be your starting point to build agents by your self. Have full control over agent flows without relying on complex agent framework.
 
+## Concept
+
+![Concept.png](/Concept.png)
+
+# Quick guide
 
 ## Installation
 
@@ -163,6 +168,14 @@ The following arguments are added to the `chat` method within `chat_completion` 
 - It was always my goal to have a well documented library. Therefore, have a look into the repositorys code to get an idea how to use it.
 - There will be a great bunch of how-to-use guides and examples in the [docs](/docs/) folder (coming soon).
 - If you need more information about the library, please feel free to open an issue.
+
+### Documentation and guides
+- [Why ollama-instructor?](/docs/README.md)
+- [Enhanced prompting within Pydantics BaseModel](/docs/Enhanced%20prompting%20within%20Pydantics%20BaseModel.mdEnhanced_prompting_within_Pydantics_BaseModel.md)
+- [How to use ollama-instructor with Pydantic](/docs/Features%20of%20ollama-instructor.mdFeatures_of_ollama-instructor.md)
+
+### Examples
+- [Image Captioning](/examples/images/image_captioning.md)
 
 
 ## License
