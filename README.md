@@ -171,8 +171,8 @@ The following arguments are added to the `chat` method within `chat_completion` 
 
 ### Documentation and guides
 - [Why ollama-instructor?](/docs/README.md)
-- [Enhanced prompting within Pydantics BaseModel](/docs/Enhanced%20prompting%20within%20Pydantics%20BaseModel.mdEnhanced_prompting_within_Pydantics_BaseModel.md)
-- [How to use ollama-instructor with Pydantic](/docs/Features%20of%20ollama-instructor.mdFeatures_of_ollama-instructor.md)
+- [Enhanced prompting within Pydantics BaseModel](/docs/Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
+- [How to use ollama-instructor with Pydantic](/docs/Features%20of%20ollama-instructor.md)
 
 ### Examples
 - [Image Captioning](/examples/images/image_captioning.md)
