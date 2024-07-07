@@ -59,7 +59,7 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
     This function takes the LLM response (data), validates it against the Pydantic model, trys to clean the data and returns the cleaned data.
 
     This works best with a partial model, as the unvalid data will be removed or set to None.
-    To make the Pydantic model partial use the function `partial_model` of the `ValidationManager` class.
+    To make the Pydantic model partial use the function `create_partial_model` of cleaner.py file.
 
     Args:
        data (Any): The data that should be validated or cleaned.
