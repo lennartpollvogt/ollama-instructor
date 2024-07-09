@@ -21,7 +21,7 @@ class ChatPromptManager:
         '''
         default_system_prompt = f'''
 You are the world class algorithm for JSON responses. You will get provided a JSON schema of a Pydantic model. Your task is to extract those in this JSON schema specified properties out of a given text or image (or its context) and return a VALID JSON response adhering to the JSON schema.
-    \nHere is the JSON schema: {pydantic_model.model_json_schema()}.
+    \nHere is the JSON schema: {pydantic_model.model_json_schema().get('properties', {})}.
     \n\nYou WILL return the instance of the JSON schema with the CORRECT extracted data, NOT the JSON schema itself. The instance of the JSON schema has the following fields to extract the data for: {list(pydantic_model.model_fields.keys())}.
         '''
         return default_system_prompt
