@@ -16,13 +16,13 @@ from ollama_instructor.validation_manager import ValidationManager
 
 class OllamaInstructorClient:
     '''
-    This class is the client for the ollama instructor. It is a simple wrapper around the ollama client.
-    It is one of two main classes that you will use to interact with the ollama instructor.
+    This class is the client of ollama-instructor. It is a simple wrapper around the ollama client.
+    It is one of two main classes that you will use to interact with ollama-instructor.
 
     Attributes:
         host (str): The host URL where the Ollama service is available. Defaults to http://localhost:11434
         debug (bool): Enable debugging to output internal states and processes. Defaults to False
-        ollama_client (ollama.AsyncClient): An asynchronous client for the Ollama API.
+        ollama_client (ollama.Client): An client for the Ollama API.
         validation_manager (ValidationManager): Handles validation of responses based on Pydantic models.
         chat_prompt_manager (ChatPromptManager): Manages creation of chat prompts based on the user input.
         chat_history (List[Dict[str, Any]]): Stores the history of chat interactions.
@@ -360,8 +360,8 @@ class OllamaInstructorClient:
 class OllamaInstructorAsyncClient:
     '''
     Asynchronous client for interacting with the Ollama language model API.
-    This class is the client for the ollama instructor. It is a simple wrapper around the ollama asynchronous client.
-    It is one of two main classes that you will use to interact with the ollama instructor.
+    This class is the client of the ollama-instructor. It is a simple wrapper around the ollama asynchronous client.
+    It is one of two main classes that you will use to interact with ollama-instructor.
 
     Attributes:
         host (str): The host URL where the Ollama service is available. Defaults to http://localhost:11434
