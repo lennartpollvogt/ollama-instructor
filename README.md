@@ -166,8 +166,8 @@ The following arguments are added to the `chat` method within `chat_completion` 
 
 ## Documentation and examples
 - It was always my goal to have a well documented library. Therefore, have a look into the repositorys code to get an idea how to use it.
-- There will be a great bunch of how-to-use guides and examples in the [docs](/docs/) folder (coming soon).
-- If you need more information about the library, please feel free to open an issue.
+- There will be a bunch of guides and examples in the [docs](/docs/) folder (work in progress).
+- If you need more information about the library, please feel free to open a discussion or write an email to lennartpollvogt@protonmail.com.
 
 ### Documentation and guides
 - [Why ollama-instructor?](/docs/README.md)
@@ -185,4 +185,5 @@ The following arguments are added to the `chat` method within `chat_completion` 
 
 ## Support and Community
 
-If you need help or want to discuss `ollama-instructor`, feel free to open an issue on GitHub.
+If you need help or want to discuss `ollama-instructor`, feel free to open an issue, a discussion or just drop me an email (lennartpollvogt@protonmail.com) on GitHub.
+I always welcome new ideas of use cases for LLMs and vision models, and would love to cover them in the examples folder. Feel free to discuss them with me via email or the issue section of this repository. 😊
