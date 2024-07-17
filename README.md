@@ -185,5 +185,5 @@ The following arguments are added to the `chat` method within `chat_completion` 
 
 ## Support and Community
 
-If you need help or want to discuss `ollama-instructor`, feel free to open an issue, a discussion or just drop me an email (lennartpollvogt@protonmail.com) on GitHub.
-I always welcome new ideas of use cases for LLMs and vision models, and would love to cover them in the examples folder. Feel free to discuss them with me via email or the issue section of this repository. 😊
+If you need help or want to discuss `ollama-instructor`, feel free to open an issue, a discussion on GitHub or just drop me an email (lennartpollvogt@protonmail.com).
+I always welcome new ideas of use cases for LLMs and vision models, and would love to cover them in the examples folder. Feel free to discuss them with me via email, issue or discussion section of this repository. 😊
