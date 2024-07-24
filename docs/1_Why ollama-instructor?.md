@@ -11,7 +11,7 @@ Here is an example:
 from ollama import Client
 
 client = Client(
-    host= "localhost:11434"
+    host= "http://localhost:11434"
 )
 
 response = client.generate(
@@ -115,7 +115,7 @@ Let's try this with **Ollama**:
 from ollama import Client
 
 client = Client(
-    host= "localhost:11434"
+    host= "http://localhost:11434"
 )
 
 response = client.chat(
@@ -192,7 +192,7 @@ Uff... this is way to much and not what i wanted. Let' try this again and give t
 from ollama import Client
 
 client = Client(
-    host= "http://192.168.0.171:11434"
+    host= "http://localhost:11434"
 )
 
 response = client.chat(

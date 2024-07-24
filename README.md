@@ -170,13 +170,16 @@ The following arguments are added to the `chat` method within `chat_completion` 
 - If you need more information about the library, please feel free to open a discussion or write an email to lennartpollvogt@protonmail.com.
 
 ### Documentation and guides
-- [Why ollama-instructor?](/docs/README.md)
-- [Enhanced prompting within Pydantics BaseModel](/docs/Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
-- [How to use ollama-instructor with Pydantic](/docs/Features%20of%20ollama-instructor.md)
+- [Why ollama-instructor?](/docs/1_Why%20ollama-instructor?.md)
+- [Features of ollama-instructor](/docs/2_Features%20of%20ollama-instructor.md)
+- [Enhanced prompting with Pydantics BaseModel](/docs/3_Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
 
 ### Examples
 - [Image Captioning](/examples/images/image_captioning.md)
 
+### Blog
+- [How to use ollama-instructor best](/blog/How%20to%20use%20ollama-instructor%20best.md)
+- [What you can learn from prompting LLMs for you relationships](/blog/What%20you%20can%20learn%20from%20prompting%20LLMs%20for%20your%20relationships.md)
 
 ## License
 
