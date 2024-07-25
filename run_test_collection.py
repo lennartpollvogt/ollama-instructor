@@ -3,7 +3,7 @@ from tests.llm_tests.test_create_character import test_create_game_character, te
 import rich
 
 host = 'http://localhost:11434'
-model= 'phi3:instruct'
+model= 'phi3'
 
 rich.print(test_text_classification(host=host,model=model, retries=2, allow_partial=True))
 

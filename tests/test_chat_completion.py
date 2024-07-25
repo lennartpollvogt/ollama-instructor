@@ -28,15 +28,15 @@ messages = [
 
 # ASYNCHRONOUS
 @pytest.mark.asyncio
-async def test_chat_completion():
+async def test_chat_completion_async():
     client = OllamaInstructorAsyncClient(
-        host='192.168.0.171:11434',
+        host='http://localhost:11434',
         debug=False
     )
     await client.async_init()
 
     response = await client.chat_completion(
-        model='phi3:instruct',
+        model='phi3',
         pydantic_model=Person,
         messages=messages
     )
@@ -56,12 +56,12 @@ async def test_chat_completion():
 # SYNCHRONOUS
 def test_chat_completion():
     client = OllamaInstructorClient(
-        host='192.168.0.171:11434',
+        host='http://localhost:11434',
         debug=False
     )
 
     response = client.chat_completion(
-        model='phi3:instruct',
+        model='phi3',
         pydantic_model=Person,
         messages=messages
     )
@@ -78,3 +78,6 @@ def test_chat_completion():
     assert set(content.keys()) == expected_keys
 
 # pytest test_chat_completion.py
+
+# pytest test_chat_completion.py::test_chat_completion_async
+# pytest test_chat_completion.py::test_chat_completion

@@ -5,7 +5,7 @@ from tests.llm_tests.test_create_todos import test_stream_create_todos
 from tests.llm_tests.test_create_person import test_stream_create_person
 
 host = 'http://localhost:11434'
-model= 'phi3:instruct'
+model= 'phi3:latest'
 
 for chunk in test_stream_create_person(host=host, model=model):
     rich.print(chunk, flush=True)

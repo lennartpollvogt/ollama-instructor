@@ -3,7 +3,8 @@ from typing import Dict, Any, Type
 import json
 from fastapi.encoders import jsonable_encoder
 from partial_json_parser import loads
-from partial_json_parser.core.options import STR, OBJ
+# from partial_json_parser.options import STR, OBJ # activate during development of ollama-instructor
+from partial_json_parser.core.options import STR, OBJ # deactivate during development of ollama-instructor but activate before uploading to PyPI
 from promptools import extractors
 from icecream import ic
 
