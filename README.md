@@ -170,7 +170,7 @@ The following arguments are added to the `chat` method within `chat_completion` 
 - If you need more information about the library, please feel free to open a discussion or write an email to lennartpollvogt@protonmail.com.
 
 ### Documentation and guides
-- [Why ollama-instructor?](/docs/1_Why%20ollama-instructor?.md)
+- [Why ollama-instructor?](/docs/1_Why%20ollama-instructor.md)
 - [Features of ollama-instructor](/docs/2_Features%20of%20ollama-instructor.md)
 - [Enhanced prompting with Pydantics BaseModel](/docs/3_Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
 
