@@ -15,6 +15,7 @@
     - https://docs.pydantic.dev/latest/
 - Retries with error guidance if the LLM returns invalid responses. You can set the maxium number of retries.
 - Allow partial responses to be returned by setting the `allow_partial` flag to True. This will try to clean set invalid data within the response and set it to `None`. Unsetted data (not part of the Pydantic model) will be deleted from the response.
+- Reasoning for the LLM to enhance the response quality of an LLM. This could be useful for complex tasks and JSON schemas to adhere and help smaller LLMs to perform better. By setting `format` to '' instead to 'json' (default) the LLM can return a string with a step by step reasoning. The LLM is instructed to return the JSON response within a code block (```json ... ```) which can be extracted from ollama-instructor (see [example](/docs/2_Features%20of%20ollama-instructor.md)).
 
 `ollama-instructor` can help you to get structured and reliable JSON from local LLMs like:
 - llama3
@@ -162,10 +163,11 @@ The following arguments are added to the `chat` method within `chat_completion` 
 - `pydantic_model`: a class of Pydantic's `BaseModel` class that is used to firstly instruct the LLM with the JSON schema of the `BaseModel` and secondly to validate the response of the LLM with the built-in validation of [Pydantic](https://docs.pydantic.dev/latest/).
 - `retries`: the number of retries if the LLM fails to generate a valid response (default: `3`). If a LLM fails the retry will provide the last response of the LLM with the given `ValidationError` and insructs it to generate a valid response.
 - `allow_partial`: If set to `True` `ollama-instructor` will modify the `BaseModel` to allow partial responses. In this case it makes sure to provide the correct instance of the JSON schema but with default or None values. Therefore, it is useful to provide default values within the `BaseModel`. With the improvement of this library you will find examples and best practice guides on that topic in the [docs](/docs/) folder.
+- `format`: In fact this is a argument of `Ollama` already. But since version `0.4.0` of `ollama-instructor` this can be set to `'json'` or `''`. By default `ollama-instructor` uses the `'json'` format. Before verion `0.4.0` only `'json'` was possible. But within `chat_completion` (**NOT** for `chat_completion_with_stream`) you can set `format` = `''` to enable the reasoning capabilities. The default system prompt of `ollama-instructor` instructs the LLM properly to response in a ```json ...``` code block, to extract the JSON for validation. When coming with a own system prompt an setting `format`= `''`, this has to be considered. See an [example here](/docs/2_Features%20of%20ollama-instructor.md).
 
 
 ## Documentation and examples
-- It was always my goal to have a well documented library. Therefore, have a look into the repositorys code to get an idea how to use it.
+- It is my goal to have a well documented library. Therefore, have a look into the repositorys code to get an idea how to use it.
 - There will be a bunch of guides and examples in the [docs](/docs/) folder (work in progress).
 - If you need more information about the library, please feel free to open a discussion or write an email to lennartpollvogt@protonmail.com.
 
