@@ -57,6 +57,7 @@ class ListOfTodos(BaseModel):
 def test_create_todos(host: str, model: str, **kwargs):
     client = OllamaInstructorClient(
         host=host,
+        debug=True
     )
     response = client.chat_completion(
         model=model,
@@ -76,6 +77,7 @@ def test_create_todos(host: str, model: str, **kwargs):
 def test_stream_create_todos(host: str, model: str, **kwargs):
     client = OllamaInstructorClient(
         host=host,
+        debug=True
     )
     response = client.chat_completion_with_stream(
         model=model,

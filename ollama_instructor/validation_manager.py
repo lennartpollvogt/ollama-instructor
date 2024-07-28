@@ -3,7 +3,7 @@ from typing import Dict, Any, Type
 import json
 from fastapi.encoders import jsonable_encoder
 from partial_json_parser import loads
-# from partial_json_parser.options import STR, OBJ # activate during development of ollama-instructor
+#from partial_json_parser.options import STR, OBJ # activate during development of ollama-instructor
 from partial_json_parser.core.options import STR, OBJ # deactivate during development of ollama-instructor but activate before uploading to PyPI
 from promptools import extractors
 from icecream import ic
@@ -35,9 +35,12 @@ class ValidationManager:
         Returns:
             the updated response with the error message and the raw message added
         '''
+        if raw_message is isinstance(raw_message, dict):
+            raw_message = json.dumps(raw_message)
         raw_message = {
             'role': 'assistant',
-            'content': json.dumps(raw_message)
+            #'content': json.dumps(raw_message)
+            'content': raw_message
         }
         response['raw_message'] = raw_message 
         if error_message is True:
@@ -98,7 +101,8 @@ class ValidationManager:
             Dict[str, Any]: the cleand version of the final response
         '''
         data = response['message']['content']
-        parsed_chunk_dict = json.loads(data)
+        #parsed_chunk_dict = json.loads(data)
+        parsed_chunk_dict = data
         partial_model = create_partial_model(pydantic_model=pydantic_model)
         ic()
         try:
@@ -130,7 +134,8 @@ class ValidationManager:
             Dict[str, Any]: The validated response dictionary, with the content field updated to match the Pydantic model.
         """
         data = response['message']['content']
-        parsed_chunk_dict = json.loads(data)
+        #parsed_chunk_dict = json.loads(data)
+        parsed_chunk_dict = data
         try:
             valid_data = pydantic_model.model_validate(parsed_chunk_dict)
             ic()
@@ -161,11 +166,11 @@ class ValidationManager:
             parsed_chunk = loads(json_string=data, allow_partial=OBJ)
             valid_data = extractors.extract_json(text=data, expect=pydantic_model, fallback=partial_pydantic_model(**fallback_data).model_dump(), allow_partial=OBJ)
             chunk['message']['content'] = jsonable_encoder(valid_data) #custom_encoder=Dict[Any, Any]
-            chunk['message']['validation_error'] = str(e.errors(include_url=False))
+            chunk['validation_error'] = str(e.errors(include_url=False))
         except Exception as e:
             ic()
             print('Exception', e)
             parsed_chunk = loads(json_string=data, allow_partial=OBJ)
             chunk['message']['content'] = jsonable_encoder(parsed_chunk)
-            chunk['message']['validation_error'] = str(e)
+            chunk['validation_error'] = str(e)
         return chunk

@@ -42,6 +42,7 @@ class ListOfCharacter(BaseModel):
 def test_create_game_character(host: str, model: str, **kwargs):
     client = OllamaInstructorClient(
         host=host,
+        debug=True
     )
     response = client.chat_completion(
         model=model,

@@ -55,40 +55,44 @@ class TextClassification(BaseModel):
 
 
 text: str = '''
-publication: 23-01-2022
-source: www.example.com
-author: Brian The Lamb
+Here is the text of the article:\n\n
+---\n
+publication: 23-01-2022\n
+source: www.example.com\n
+author: Brian The Lamb\n
 
 # The Fusion of Photography and Fashion: An Artistic Symphony
 
-In the vast and vibrant world of art, the amalgamation of photography and fashion stands out as a dynamic force that transcends time and trends. This artistic symphony not only captures the essence of contemporary culture but also serves as a canvas for creative expression, where every snapshot tells a story, and every outfit is a character in its own right.
+\n\nIn the vast and vibrant world of art, the amalgamation of photography and fashion stands out as a dynamic force that transcends time and trends. This artistic symphony not only captures the essence of contemporary culture but also serves as a canvas for creative expression, where every snapshot tells a story, and every outfit is a character in its own right.
 
-## The Birth of Fashion Photography
+\n\n## The Birth of Fashion Photography
 
-Fashion photography, as we know it today, emerged in the early 20th century, born out of a necessity to document and advertise the latest clothing designs. However, it quickly evolved from mere catalog images into a form of high art, thanks to visionary photographers who saw the potential in this medium to explore and express ideas of beauty, style, and society.
+\n\nFashion photography, as we know it today, emerged in the early 20th century, born out of a necessity to document and advertise the latest clothing designs. However, it quickly evolved from mere catalog images into a form of high art, thanks to visionary photographers who saw the potential in this medium to explore and express ideas of beauty, style, and society.
 
-## A Medium of Endless Creativity
+\n\n## A Medium of Endless Creativity
 
-At its core, fashion photography is about storytelling. Through the lens of the photographer, a garment becomes more than just fabric and thread; it transforms into a symbol of identity, culture, and emotion. This genre of photography is unique in its ability to blend elements such as lighting, scenery, and composition with the aesthetic and mood of the clothing, creating images that are not only visually stunning but also rich in narrative.
+\n\nAt its core, fashion photography is about storytelling. Through the lens of the photographer, a garment becomes more than just fabric and thread; it transforms into a symbol of identity, culture, and emotion. This genre of photography is unique in its ability to blend elements such as lighting, scenery, and composition with the aesthetic and mood of the clothing, creating images that are not only visually stunning but also rich in narrative.
 
-## The Impact of Technology and Social Media
+\n\n## The Impact of Technology and Social Media
 
-The advent of digital photography and social media has revolutionized the way we experience fashion photography. High-quality images are now accessible to anyone with a smartphone, democratizing the art form and allowing for a more diverse range of voices and visions to be heard. Social media platforms, in particular, have become virtual galleries for fashion photographers, both amateur and professional, to showcase their work and reach a global audience.
+\n\nThe advent of digital photography and social media has revolutionized the way we experience fashion photography. High-quality images are now accessible to anyone with a smartphone, democratizing the art form and allowing for a more diverse range of voices and visions to be heard. Social media platforms, in particular, have become virtual galleries for fashion photographers, both amateur and professional, to showcase their work and reach a global audience.
 
-## Challenges and Opportunities
+\n\n## Challenges and Opportunities
 
-Despite its glamour, fashion photography is not without its challenges. Critics argue that it often perpetuates unrealistic beauty standards and contributes to the commodification of culture. However, many photographers are using their platform to challenge these norms, embracing inclusivity and sustainability in their work. By highlighting diverse bodies, cultures, and fashion practices, they are redefining what fashion photography can be and the messages it can convey.
+\n\nDespite its glamour, fashion photography is not without its challenges. Critics argue that it often perpetuates unrealistic beauty standards and contributes to the commodification of culture. However, many photographers are using their platform to challenge these norms, embracing inclusivity and sustainability in their work. By highlighting diverse bodies, cultures, and fashion practices, they are redefining what fashion photography can be and the messages it can convey.
 
-## The Future of Fashion Photography
+\n\n## The Future of Fashion Photography
 
-As we look to the future, it's clear that fashion photography will continue to evolve, influenced by changes in technology, society, and the fashion industry itself. Virtual and augmented reality, for example, offer new dimensions for creativity, allowing photographers to create immersive experiences that blur the lines between reality and fantasy.
+\n\nAs we look to the future, it's clear that fashion photography will continue to evolve, influenced by changes in technology, society, and the fashion industry itself. Virtual and augmented reality, for example, offer new dimensions for creativity, allowing photographers to create immersive experiences that blur the lines between reality and fantasy.
 
-In conclusion, the fusion of photography and fashion is a testament to the power of visual storytelling. It is a field that continues to inspire and be inspired by the changing world around it, forever capturing the beauty, complexity, and dynamism of human expression through fashion. As we move forward, the possibilities are as limitless as the creativity of those who wield the camera.
+\nIn conclusion, the fusion of photography and fashion is a testament to the power of visual storytelling. It is a field that continues to inspire and be inspired by the changing world around it, forever capturing the beauty, complexity, and dynamism of human expression through fashion. As we move forward, the possibilities are as limitless as the creativity of those who wield the camera.
+\n---
 '''
 
 def test_text_classification(host: str, model: str, **kwargs):
     client = OllamaInstructorClient(
-        host=host
+        host=host,
+        debug=True
     )
         
     response = client.chat_completion(
@@ -104,6 +108,9 @@ def test_text_classification(host: str, model: str, **kwargs):
                 'content': text
             }
         ],
+        options = {
+            'temperature': 0.1,
+        },
         **kwargs
     )
     return response
