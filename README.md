@@ -8,17 +8,17 @@
 
 ## Features
 
-- Easy integration with the Ollama repository for running open-source LLMs locally. See: 
+- Easy **integration with the Ollama** repository for running open-source LLMs locally. See: 
     - https://github.com/ollama/ollama
     - https://github.com/ollama/ollama-python
-- Data validation using Pydantic models to ensure the JSON response from a LLM meets the specified schema. See:
+- Data **validation** using **Pydantic BaseModel** to ensure the JSON response from a LLM meets the specified schema. See:
     - https://docs.pydantic.dev/latest/
-- Retries with error guidance if the LLM returns invalid responses. You can set the maxium number of retries.
-- Allow partial responses to be returned by setting the `allow_partial` flag to True. This will try to clean set invalid data within the response and set it to `None`. Unsetted data (not part of the Pydantic model) will be deleted from the response.
-- Reasoning for the LLM to enhance the response quality of an LLM. This could be useful for complex tasks and JSON schemas to adhere and help smaller LLMs to perform better. By setting `format` to '' instead to 'json' (default) the LLM can return a string with a step by step reasoning. The LLM is instructed to return the JSON response within a code block (```json ... ```) which can be extracted from ollama-instructor (see [example](/docs/2_Features%20of%20ollama-instructor.md)).
+- **Retries with error guidance** if the LLM returns invalid responses. You can set the maxium number of retries.
+- **Allow partial responses** to be returned by setting the `allow_partial` flag to True. This will try to clean set invalid data within the response and set it to `None`. Unsetted data (not part of the Pydantic model) will be deleted from the response.
+- **Reasoning** for the LLM to enhance the response quality of an LLM. This could be useful for complex tasks and JSON schemas to adhere and help smaller LLMs to perform better. By setting `format` to '' instead to 'json' (default) the LLM can return a string with a step by step reasoning. The LLM is instructed to return the JSON response within a code block (```json ... ```) which can be extracted from ollama-instructor (see [example](/docs/2_Features%20of%20ollama-instructor.md)).
 
 `ollama-instructor` can help you to get structured and reliable JSON from local LLMs like:
-- llama3
+- llama3 & llama3.1
 - phi3
 - mistral
 - gemma
