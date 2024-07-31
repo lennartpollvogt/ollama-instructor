@@ -1,3 +1,6 @@
+[![Downloads](https://static.pepy.tech/badge/ollama-instructor/month)](https://pepy.tech/project/ollama-instructor)
+
+
 # ollama-instructor
 
 `ollama-instructor` is a lightweight Python library that provides a convenient wrapper around the Client of the renowned Ollama repository, extending it with validation features for obtaining valid JSON responses from a Large Language Model (LLM). Utilizing Pydantic, `ollama-instructor` allows users to specify models for JSON schemas and data validation, ensuring that responses from LLMs adhere to the defined schema.
