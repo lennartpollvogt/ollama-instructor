@@ -68,15 +68,15 @@ class ValidationManager:
             pydantic_model: the pydantic model for validate the final response
 
         Returns:
-            `True` or `ValidationError`
+            `False` or `ValidationError`
         '''
         data = json.dumps(response['message']['content'])
         parsed_chunk_dict = json.loads(data)
         ic()
         try:
             if pydantic_model.model_validate(obj=parsed_chunk_dict):
-                ic(True)
-                return True
+                ic(False)
+                return False
         except ValidationError as e:
             ic()
             return e.errors(include_url=False)

@@ -4,6 +4,7 @@ from tests.llm_tests.test_create_todos import test_create_todos
 import rich
 
 host = 'http://localhost:11434'
+#model = 'llama3.1:8b-instruct-q5_1'
 model= 'gemma:2b-instruct'
 
 # format == 'json'
@@ -25,4 +26,4 @@ print('3. test_create_game_characters')
 rich.print(test_create_game_characters(host=host, model=model, retries=2, allow_partial=False, format=''))
 
 print('4. test_create_todos')
-rich.print(test_create_todos(host=host, model=model, retries=3, allow_partial=False, format=''))
+rich.print(test_create_todos(host=host, model=model, retries=5, allow_partial=False, format=''))

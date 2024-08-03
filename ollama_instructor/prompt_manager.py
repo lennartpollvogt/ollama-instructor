@@ -67,7 +67,7 @@ You are the world class algorithm for JSON responses. You will get provided a JS
         '''
         error_guidance_prompt = {
                                     'role': 'system',
-                                    'content': f'The last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON and fill in the correct data while adhering the context and the JSON schema above!'
+                                    'content': f'The last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON and fill in the correct data while adhering the context and the JSON schema above! Make sure to adhere to given enums and choose the most likely value if value is required.'
                                 }
         return error_guidance_prompt
     
@@ -81,11 +81,13 @@ You are the world class algorithm for JSON responses. You will get provided a JS
         Returns:
             Dict[str, Any]: The error guidance prompt as a message (dict).
         '''
-        error_guidance_prompt = {
+        error_guidance_prompt = f'The code block of the last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON in the code block and fill in the correct data while adhering the context and the JSON schema above! A code block has to start with ```json and ends with ```. If you are not using a code block the validation will fail!'
+
+        error_guidance_message = {
                                     'role': 'system',
-                                    'content': f'The code block of the last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON in the code block and fill in the correct data while adhering the context and the JSON schema above!'
+                                    'content': error_guidance_prompt
                                 }
-        return error_guidance_prompt
+        return error_guidance_message
     
     ####################
     # PROMPT HELPER FUNCTION

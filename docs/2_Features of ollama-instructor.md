@@ -25,10 +25,10 @@ In most of the cases I will use `chat_completion` for examples but you can use `
 
 ## Reasoning
 
-The `chat_completion` method of ollama-instructor is able to receive the value `''` for the argument `format`. The enables the reasoning capabilities of LLMs and can be used for more complex tasks or JSON schemas. Even for smaller models this could be beneficial.
+The `chat_completion` method of ollama-instructor is able to receive the value `''` for the argument `format`. This enables the reasoning capabilities of LLMs and can be used for more complex tasks or JSON schemas. Especially for smaller models this could be beneficial.
 
 ### How is this done?
-By setting `format` = '' the LLM is not forced to respond within JSON. Therefore, the instructions are crucial, to get a JSON anyway. But with `format` = '' the capabilities of LLMs to reason step by step before answering can be used. When you set `format` = '' the LLM will be instructed differently (have a look into the code in file 'prompt_manager.py'). After the step by step reasoning the LLM is instructed to respond within a code block starting with ```json and ending with ```. The content of this code block will be extracted and validated against the Pydantic model. When comments within the JSON code block occur, the code tries to delete them.
+By setting `format` = '' the LLM is not forced to respond within JSON. Therefore, the instructions are crucial, to get a JSON anyway. But with `format` = '' the capabilities of LLMs to reason step by step before answering can be used. When you set `format` = '' the LLM will be instructed differently (have a look into the code in file 'prompt_manager.py'). After the step by step reasoning the LLM is instructed to respond within a code block starting with ```´´´json and ending with ´´´```. The content of this code block will be extracted and validated against the Pydantic model. When comments within the JSON code block occur, the code tries to delete them.
 
 ### Example:
 Here is an example for the usage:

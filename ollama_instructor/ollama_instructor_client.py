@@ -58,20 +58,19 @@ class BaseOllamaInstructorClient:
         # Remove comments from the code block
         code_block = re.sub(r'//.*|#.*|%.*', '', code_block)
         code_block = re.sub(r'/\*.*?\*/', '', code_block, flags=re.DOTALL)
-        rich.print(code_block)
-        print(type(code_block))
+        ic(code_block)
+        ic(type(code_block))
 
         return code_block
 
     def handle_response(self, response: Dict[str, Any], pydantic_model: Type[BaseModel], allow_partial: bool, format: Literal['json', '']):
         ic(type(response['message']['content']))
-        ic(response['message']['content'])
+        ic(response)
 
         # Capture the raw response content
         raw_response = deepcopy(response)
         raw_response_content = raw_response['message']['content']
         self.chat_history.append(raw_response['message'])  # Store the raw message before modification
-        ic(self.chat_history)
 
         if format == '':
             content = response['message']['content']
@@ -79,9 +78,22 @@ class BaseOllamaInstructorClient:
                 content = self.extract_code_block(content)
                 ic(content)
                 if content == 'Code block not found' or content == 'Code block end not found':
-                    content = self.validation_manager.validate_partial_model(content=raw_response_content, pydantic_model=pydantic_model)
+                    content: dict = {}
+                    # create empty dict with keys from pydantic model and set all values to None
+                    for key in pydantic_model.model_fields:
+                        content[key] = None
+                    # convert content to string
+                    content = json.dumps(content)
+                    updated_response = {
+                        'role': 'assistant',
+                        'content': f'```json\n{content}\n```'
+                    }
+                    # replace the last message in chat_history with the updated content
+                    self.chat_history[-1] = updated_response
                 else:
-                    content = jsonable_encoder(content)   
+                    content = jsonable_encoder(content) 
+                    ic()
+                    ic(content) 
         else:
             content = jsonable_encoder(response['message']['content'])
 
@@ -95,34 +107,45 @@ class BaseOllamaInstructorClient:
         # Store the full raw response content
         response = self.validation_manager.add_error_log_to_final_response(response=response, error_message=self.validation_error, raw_message=raw_response_content)
         ic()
-        
         ic(self.retry_counter)
-        if self.validation_error is not True and self.retry_counter > 0:
-            try:
 
-                if allow_partial:
-                    ic(allow_partial)
-                    response = self.validation_manager.validate_partial_model(response=response, pydantic_model=pydantic_model)
-                    ic()
-                    response['retries_left'] = self.retry_counter
-                    return response
-                elif allow_partial is False:
+        # Validate and return response under certain conditions
+        if self.validation_error is not False:
+            if self.retry_counter > 1:
+                try:
                     ic(allow_partial)
                     response = self.validation_manager.validate_chat_completion(response=response, pydantic_model=pydantic_model)
                     ic(response)
-                    response['retries_left'] = self.retry_counter   
-            except ValidationError as e:
-                ic(e)
-                raise e
-        elif self.validation_error is True and self.retry_counter > 0:
+                    response['retries_left'] = self.retry_counter  
+                    return response
+                except ValidationError as e:
+                    ic(e)
+                    raise e
+            elif self.retry_counter == 1:
+                try:
+                    if allow_partial:
+                        ic(allow_partial)
+                        response = self.validation_manager.validate_partial_model(response=response, pydantic_model=pydantic_model)
+                        ic()
+                        response['retries_left'] = self.retry_counter
+                        return response
+                    elif allow_partial is False:
+                        ic(allow_partial)
+                        response = self.validation_manager.validate_chat_completion(response=response, pydantic_model=pydantic_model)
+                        ic(response)
+                        response['retries_left'] = self.retry_counter
+                        return response
+                except ValidationError as e:
+                    ic(e)
+                    raise e
+            else:
+                ic()
+                raise Exception("Retries exhausted and validation still fails.")
+        else:
             ic()
-            #response['message']['content'] = json.loads(response['message']['content'])
             response['message']['content'] = response['message']['content'] # TODO: maybe check if already string
             response['retries_left'] = self.retry_counter
             return response
-        else:
-            ic()
-            raise Exception("Retries exhausted and validation still fails.")
 
     def handle_stream_response(self, response, pydantic_model: Type[BaseModel], allow_partial: bool, format: Literal['json', '']): # not in use. Needs refactoring to handle stream and retry logic
         # format = '' is not used yet
@@ -142,7 +165,7 @@ class BaseOllamaInstructorClient:
 
         self.chat_history += [chunk['message']]
         chunk['message']['content'] = json.dumps(chunk['message']['content'])
-        if self.validation_error is not True:
+        if self.validation_error is not False:
             if self.retry_counter == 0:
                 if allow_partial:
                     try:
@@ -165,7 +188,7 @@ class BaseOllamaInstructorClient:
             else:
                 ic()
                 self.retry_counter -= 1
-        elif self.validation_error is True and self.retry_counter > 0:
+        elif self.validation_error is False and self.retry_counter > 0:
             try:
                 ic()
                 chunk['message']['content'] = json.loads(chunk['message']['content'])
@@ -295,10 +318,11 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         '''
         self.create_prompt_and_handle_retry(pydantic_model, messages, retries, format=format)
     
-        while self.validation_error is not True and self.retry_counter > 0:
+        while self.validation_error is not False and self.retry_counter > 0:
             ic(self.retry_counter)
             self.update_prompt_with_error(format=format)
             ic(self.chat_history)
+            #rich.print(self.chat_history)
             
             try:
                 ic()
@@ -311,6 +335,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     stream=False,
                     **kwargs
                 )
+                #rich.print(response)
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
                 except ValidationError as e:
@@ -413,7 +438,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                 # turn the final response into a str
                 chunk['message']['content'] = json.dumps(chunk['message']['content'])
                 # Validate the final response
-                if self.validation_error is not True:
+                if self.validation_error is not False:
                     if self.retry_counter == 0:
                         ic()
                         if allow_partial:
@@ -534,7 +559,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         '''
         self.create_prompt_and_handle_retry(pydantic_model=pydantic_model, messages=messages, retries=retries, format=format)
         
-        while self.validation_error is not True and self.retry_counter > 0:
+        while self.validation_error is not False and self.retry_counter > 0:
             ic(self.retry_counter)
             self.update_prompt_with_error(format=format)
             ic(self.chat_history)
