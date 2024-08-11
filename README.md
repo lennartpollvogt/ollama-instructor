@@ -33,6 +33,8 @@
 
 ![Concept.png](/Concept.png)
 
+> Find more here: [The concept of ollama-instructor](/docs/3_The%20concept%20of%20ollama-instructor.md)
+
 # Quick guide
 
 ## Installation
@@ -177,7 +179,8 @@ The following arguments are added to the `chat` method within `chat_completion` 
 ### Documentation and guides
 - [Why ollama-instructor?](/docs/1_Why%20ollama-instructor.md)
 - [Features of ollama-instructor](/docs/2_Features%20of%20ollama-instructor.md)
-- [Enhanced prompting with Pydantics BaseModel](/docs/3_Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
+- [The concept of ollama-instructor](/docs/3_The%20concept%20of%20ollama-instructor.md)
+- [Enhanced prompting with Pydantics BaseModel](/docs/4_Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
 
 ### Examples
 - [Image Captioning](/examples/images/image_captioning.md)

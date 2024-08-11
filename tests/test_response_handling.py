@@ -130,4 +130,21 @@ def test_handle_response_with_comments(client):
     assert 'Nick' in content['friends']
     assert 'Gabriel' in content['friends']
 
+
+def test_max_retries_reached(client):
+    client.retry_counter = 3
+    response = {
+        'message': {
+            'content': '{"name": "John", "age": "invalid", "gender": "male"}'
+        }
+    }
+
+    with pytest.raises(ValidationError):
+        client.handle_response(
+            response=response,
+            pydantic_model=Person,
+            allow_partial=False,
+            format='json'
+        )
+
 # pytest test_response_handling.py

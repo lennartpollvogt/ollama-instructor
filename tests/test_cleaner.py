@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import pytest
 import json
 
@@ -52,5 +52,102 @@ def test_clean_data_with_invalid_type():
     cleaned_data = clean_nested_data_with_error_dict(input_data, SampleModel)
     assert cleaned_data == expected_output, "The cleaned data should set invalid types to None."
 
+
+
+# NESTED MODEL
+class Address(BaseModel):
+    street: str
+    city: str
+    zip_code: int
+
+class Person(BaseModel):
+    name: str
+    age: int
+    email: Optional[str] = None
+    addresses: List[Address]
+
+def test_clean_nested_data_with_complex_structure():
+    data = {
+        "name": "John Doe",
+        "age": "invalid",
+        "email": "john@example.com",
+        "addresses": [
+            {"street": "123 Main St", "city": "Springfield", "zip_code": 12345},
+            {"street": "456 Elm St", "city": "Shelbyville", "zip_code": "invalid"},
+            {"street": "789 Oak Rd", "city": "Capital City", "zip_code": 67890}
+        ]
+    }
+
+    PartialPerson = create_partial_model(Person)
+    cleaned_data = clean_nested_data_with_error_dict(data, PartialPerson)
+
+    assert cleaned_data == {
+        "name": "John Doe",
+        "age": None,
+        "email": "john@example.com",
+        "addresses": [
+            {"street": "123 Main St", "city": "Springfield", "zip_code": 12345},
+            {"street": "456 Elm St", "city": "Shelbyville", "zip_code": None},
+            {"street": "789 Oak Rd", "city": "Capital City", "zip_code": 67890}
+        ]
+    }
+
+    # Additional assertions to check specific aspects
+    assert cleaned_data["age"] is None
+    assert len(cleaned_data["addresses"]) == 3
+    assert cleaned_data["addresses"][1]["zip_code"] is None
+    assert cleaned_data["addresses"][0]["zip_code"] == 12345
+    assert cleaned_data["addresses"][2]["zip_code"] == 67890
+
+def test_clean_nested_data_with_invalid_nested_object():
+    data = {
+        "name": "Jane Doe",
+        "age": 30,
+        "addresses": [
+            {"street": "123 Main St", "city": "Springfield", "zip_code": 12345},
+            {"street": 123, "city": "Shelbyville", "zip_code": 54321},  # Invalid street
+            {"street": "789 Oak Rd", "city": "Capital City", "zip_code": 67890}
+        ]
+    }
+
+    PartialPerson = create_partial_model(Person)
+    cleaned_data = clean_nested_data_with_error_dict(data, PartialPerson)
+
+    assert cleaned_data == {
+        "name": "Jane Doe",
+        "age": 30,
+        "addresses": [
+            {"street": "123 Main St", "city": "Springfield", "zip_code": 12345},
+            {"street": None, "city": "Shelbyville", "zip_code": 54321},
+            {"street": "789 Oak Rd", "city": "Capital City", "zip_code": 67890}
+        ]
+    }
+
+    assert cleaned_data["addresses"][1]["street"] is None
+    assert cleaned_data["addresses"][1]["city"] == "Shelbyville"
+    assert cleaned_data["addresses"][1]["zip_code"] == 54321
+
+def test_clean_nested_data_with_missing_fields():
+    data = {
+        "name": "Alice Smith",
+        "addresses": [
+            {"street": "123 Main St", "city": "Springfield"},  # Missing zip_code
+            {"street": "456 Elm St", "city": "Shelbyville", "zip_code": 54321}
+        ]
+    }
+
+    PartialPerson = create_partial_model(Person)
+    cleaned_data = clean_nested_data_with_error_dict(data, PartialPerson)
+
+    assert cleaned_data == {
+        "name": "Alice Smith",
+        "addresses": [
+            {"street": "123 Main St", "city": "Springfield", "zip_code": None},
+            {"street": "456 Elm St", "city": "Shelbyville", "zip_code": 54321}
+        ]
+    }
+
+    assert "age" not in cleaned_data
+    assert cleaned_data["addresses"][0]["zip_code"] is None
 
 # pytest test_cleaner.py
