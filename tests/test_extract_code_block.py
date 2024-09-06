@@ -112,7 +112,7 @@ def test_extract_code_block_with_mixed_comments():
     expected = '''
     {
         "name": "John Doe", 
-        "age": 30, 
+        "age": 30,  
     }
     '''
     assert client.extract_code_block(content).strip() == expected.strip()
@@ -188,4 +188,4 @@ def test_extract_code_block_with_leading_trailing_text():
 
 # Add more test cases as needed
 
-# To run the tests, execute: pytest test_extract_code_block.py
+# pytest test_extract_code_block.py

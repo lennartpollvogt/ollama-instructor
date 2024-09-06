@@ -1,13 +1,31 @@
-[![Downloads](https://static.pepy.tech/badge/ollama-instructor/month)](https://pepy.tech/project/ollama-instructor)
-
-
 # ollama-instructor
 
 `ollama-instructor` is a lightweight Python library that provides a convenient wrapper around the Client of the renowned Ollama repository, extending it with validation features for obtaining valid JSON responses from a Large Language Model (LLM). Utilizing Pydantic, `ollama-instructor` allows users to specify models for JSON schemas and data validation, ensuring that responses from LLMs adhere to the defined schema.
 
+[![Downloads](https://static.pepy.tech/badge/ollama-instructor/month)](https://pepy.tech/project/ollama-instructor)
+
 > **Note 1**: This library has a native support for the Ollamas Python client. If you want to have more flexibility with other providers like Groq, OpenAI, Perplexity and more, have a look into the great library of [instrutor](https://github.com/jxnl/instructor) of Jason Lui.
 
 > **Note 2**: This library depends on having [Ollama](https://ollama.com) installed and running. For more information, please refer to the official website of Ollama.
+
+---
+
+### Documentation and guides
+- [Why ollama-instructor?](/docs/1_Why%20ollama-instructor.md)
+- [Features of ollama-instructor](/docs/2_Features%20of%20ollama-instructor.md)
+- [The concept of ollama-instructor](/docs/3_The%20concept%20of%20ollama-instructor.md)
+- [Enhanced prompting with Pydantics BaseModel](/docs/4_Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
+- [Best practices](/docs/5_Best%20practices.md)
+
+### Examples
+- [Image Captioning](/examples/images/image_captioning.md)
+- [Todos from Conversation](/examples/todos/todos_from_chat.md)
+
+### Blog
+- [How to use ollama-instructor best](/blog/How%20to%20use%20ollama-instructor%20best.md)
+- [What you can learn from prompting LLMs for you relationships](/blog/What%20you%20can%20learn%20from%20prompting%20LLMs%20for%20your%20relationships.md)
+- [May the BaseModel be with you](/blog/May%20the%20BaseModel%20be%20with%20you.md)
+
 
 ## Features
 
@@ -176,18 +194,6 @@ The following arguments are added to the `chat` method within `chat_completion` 
 - There will be a bunch of guides and examples in the [docs](/docs/) folder (work in progress).
 - If you need more information about the library, please feel free to open a discussion or write an email to lennartpollvogt@protonmail.com.
 
-### Documentation and guides
-- [Why ollama-instructor?](/docs/1_Why%20ollama-instructor.md)
-- [Features of ollama-instructor](/docs/2_Features%20of%20ollama-instructor.md)
-- [The concept of ollama-instructor](/docs/3_The%20concept%20of%20ollama-instructor.md)
-- [Enhanced prompting with Pydantics BaseModel](/docs/4_Enhanced%20prompting%20within%20Pydantics%20BaseModel.md)
-
-### Examples
-- [Image Captioning](/examples/images/image_captioning.md)
-
-### Blog
-- [How to use ollama-instructor best](/blog/How%20to%20use%20ollama-instructor%20best.md)
-- [What you can learn from prompting LLMs for you relationships](/blog/What%20you%20can%20learn%20from%20prompting%20LLMs%20for%20your%20relationships.md)
 
 ## License
 

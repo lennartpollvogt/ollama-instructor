@@ -28,6 +28,24 @@ class BaseOllamaInstructorClient:
         if not debug:
             ic.disable()
 
+    # resetting the states with each request to avoid errors using 
+    # instances of the client in a loop
+    def reset_states(self, retries):
+        '''
+        Resets the state of the client by clearing the validation error, 
+        setting the retry counter to the specified number of retries, 
+        and clearing the chat history. This is intended to ensure that 
+        each request starts with a clean state, avoiding errors when using
+        instances of the client in a loop.
+
+        Args:
+            retries (int): The number of retries to set for the request. 
+                           This will be stored in the `retry_counter` attribute.
+        '''
+        self.validation_error = None
+        self.retry_counter = retries
+        self.chat_history = []
+
     def create_prompt_and_handle_retry(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], retries: int, format: Literal['json', '']):
         self.retry_counter = retries
         self.chat_history = self.chat_prompt_manager.create_chat_prompt_for_json(pydantic_model=pydantic_model, messages=messages, format=format)
@@ -316,6 +334,9 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             # {'name': 'Jason', 'age': 45, 'gender': 'male'}
             ```
         '''
+        # Reset state
+        self.reset_states(retries=retries)
+
         self.create_prompt_and_handle_retry(pydantic_model, messages, retries, format=format)
     
         while self.validation_error is not False and self.retry_counter > 0:
@@ -344,8 +365,8 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             except Exception as e:
                 ic()
                 raise e
-
-        raise Exception("Retries exhausted and validation still fails.")
+        # TODO: Test the exception for retries
+        #raise Exception("Retries exhausted and validation still fails.")
 
     def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Generator[Dict[str, Any], None, None]: 
         '''
@@ -398,6 +419,9 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             # >>> Output example:
             # {'name': 'Jason', 'age': 45, 'gender': 'male'}
         '''
+        # Reset state
+        self.reset_states(retries=retries)
+
         self.retry_counter = retries
         system_and_user_prompt = self.chat_prompt_manager.create_chat_prompt_for_json(pydantic_model=pydantic_model, messages=messages, format='json')
         self.chat_history = system_and_user_prompt
@@ -557,6 +581,9 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
             asyncio.run(main())
         ```
         '''
+        # Reset state
+        self.reset_states(retries=retries)
+
         self.create_prompt_and_handle_retry(pydantic_model=pydantic_model, messages=messages, retries=retries, format=format)
         
         while self.validation_error is not False and self.retry_counter > 0:

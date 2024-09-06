@@ -36,7 +36,7 @@ async def test_chat_completion_async():
     await client.async_init()
 
     response = await client.chat_completion(
-        model='phi3',
+        model='phi3.5:latest',
         pydantic_model=Person,
         messages=messages
     )
@@ -61,7 +61,7 @@ def test_chat_completion():
     )
 
     response = client.chat_completion(
-        model='phi3',
+        model='phi3.5:latest',
         pydantic_model=Person,
         messages=messages
     )

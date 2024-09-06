@@ -291,7 +291,7 @@ print(response['message']['content'])
 }
 ```
 
-As you may recognized this examples has not system prompt but the class `User` is used as a parameter of the function `chat_completion`. That's because `ollama-instructor` brings its own system prompt where it instructs the LLM with the help of the **Pydantic** model to respond in the correct structure with the asked data. 
+As you may recognized this examples has not system prompt but the class `Todo` is used as a parameter of the function `chat_completion`. That's because `ollama-instructor` brings its own system prompt where it instructs the LLM with the help of the **Pydantic** model to respond in the correct structure with the asked data. 
 And additionally, `ollama-instructor` will validate the response if it fits the given **Pydantic** model. If the validation fails, it will ask the LLM again within a certain number of retries (default is 3) until the LLM gives a valid answer or the maximum number of retries is reached.
 
 ## Own system prompts
