@@ -162,3 +162,5 @@ async_stream_test.py
 async_test.py
 test.py
 .python-version
+test_list.py
+test_stream.py
