@@ -20,6 +20,7 @@
 ### Examples
 - [Image Captioning](/examples/images/image_captioning.md)
 - [Todos from Conversation](/examples/todos/todos_from_chat.md)
+- [Multiple async operations](examples/async/async_operations.md)
 
 ### Blog
 - [How to use ollama-instructor best](/blog/How%20to%20use%20ollama-instructor%20best.md)
@@ -29,7 +30,7 @@
 
 ## Features
 
-- Easy **integration with the Ollama** repository for running open-source LLMs locally. See: 
+- Easy **integration with the Ollama** repository for running open-source LLMs locally. See:
     - https://github.com/ollama/ollama
     - https://github.com/ollama/ollama-python
 - Data **validation** using **Pydantic BaseModel** to ensure the JSON response from a LLM meets the specified schema. See:
@@ -79,8 +80,8 @@ class Person(BaseModel):
 
 client = OllamaInstructorClient(...)
 response = client.chat_completion(
-    model='phi3', 
-    pydantic_model=Person, 
+    model='phi3',
+    pydantic_model=Person,
     messages=[
         {
             'role': 'user',
@@ -154,8 +155,8 @@ class Person(BaseModel):
 
 client = OllamaInstructorClient(...)
 response = client.chat_completion_with_stream(
-    model='phi3', 
-    pydantic_model=Person, 
+    model='phi3',
+    pydantic_model=Person,
     messages=[
         {
             'role': 'user',
@@ -172,7 +173,7 @@ for chunk in response:
 
 The classes `OllamaInstructorClient` and `OllamaInstructorAsyncClient` are the main class of the `ollama-instructor` library. They are the wrapper around the `Ollama` (async) client and contain the following arguments:
 - `host`: the URL of the Ollama server (default: `http://localhost:11434`). See documentation of [Ollama](https://github.com/ollama/ollama)
-- `debug`: a `bool` indicating whether to print debug messages (default: `False`). 
+- `debug`: a `bool` indicating whether to print debug messages (default: `False`).
 
 > **Note**: I am currently working with `iceream` for the debug messages. Will try to improve that in further development of this library.
 
