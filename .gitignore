@@ -161,3 +161,4 @@ cython_debug/
 async_stream_test.py
 async_test.py
 test.py
+.python-version
