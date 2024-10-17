@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ValidationError
-from typing import Dict, Any, Type
+from typing import Dict, Any, Type, Mapping, Iterator, List
 import json
 from fastapi.encoders import jsonable_encoder
 from partial_json_parser import loads
@@ -7,23 +7,24 @@ from partial_json_parser import loads
 from partial_json_parser.core.options import STR, OBJ # deactivate during development of ollama-instructor but activate before uploading to PyPI
 from promptools import extractors
 from icecream import ic
+from pydantic_core import ErrorDetails
 
 from .cleaner import clean_nested_data_with_error_dict, create_partial_model
 
 class ValidationManager:
     '''
     The `ValidationManager` class provides several functions to make sure the responses of LLMs are validated against a given Pydantic model.
-    '''            
+    '''
 
     ####################
     # HELPER FUNCTION
     ####################
     def add_error_log_to_final_response(
         self,
-        response: Dict[str, Any],
-        error_message: ValidationError,
-        raw_message: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        response: Mapping[str, Any],
+        error_message: bool | None | List[ErrorDetails],
+        raw_message: str | dict
+    ) -> Mapping[str, Any]:
         '''
         This adds the error message to the final response, with the final validation.
 
@@ -42,7 +43,7 @@ class ValidationManager:
             #'content': json.dumps(raw_message)
             'content': raw_message
         }
-        response['raw_message'] = raw_message 
+        response['raw_message'] = raw_message
         if error_message is True:
             ic()
             response['validation_error'] = None
@@ -57,9 +58,9 @@ class ValidationManager:
     ####################
     def validate_for_error_message(
         self,
-        response: Dict[str, Any],
+        response: Mapping[str, Any],
         pydantic_model: Type[BaseModel],
-    ) -> bool | Type[ValidationError]:
+    )-> bool | None | List[ErrorDetails]:
         '''
         This validates the final response from a chat completion (with or without streaming).
 
@@ -76,16 +77,18 @@ class ValidationManager:
         try:
             if pydantic_model.model_validate(obj=parsed_chunk_dict):
                 ic(False)
-                return False
+                return False # return False, None # TODO: edit
+                #return False, None
         except ValidationError as e:
             ic()
-            return e.errors(include_url=False)
-    
+            return e.errors(include_url=False) # return True, e.errors(include_url=False # TODO: edit
+            #return True, e.errors(include_url=False)
+
     def validate_partial_model(
         self,
-        response: Dict[str, Any],
+        response: Mapping[str, Any] | Iterator[Mapping[str, Any]],
         pydantic_model: Type[BaseModel]
-    ) -> Dict[str, Any]:
+    ) -> Mapping[str, Any] | Iterator[Mapping[str, Any]]:
         '''
         This function will take the Pydantic model and parse it into a partial model.
         Then the final response will be compared with the partial model and gets cleaned when still some `ValidationError` occur.
@@ -114,22 +117,22 @@ class ValidationManager:
         except ValidationError as e:
             ic()
             raise e
-        
+
     ####################
     # VALIDATION OF CHAT COMPLETION
     ####################
     def validate_chat_completion(
         self,
-        response: Dict[str, Any],
+        response: Mapping[str, Any],
         pydantic_model: Type[BaseModel],
-    ) -> Dict[str, Any]:
+    ) -> Mapping[str, Any]:
         """
         Validates the response from a chat completion request, ensuring the content is valid according to the provided Pydantic model.
-        
+
         Args:
             response (Dict[str, Any]): The response dictionary from the chat completion request.
             pydantic_model (Type[BaseModel]): The Pydantic model to validate the response against.
-        
+
         Returns:
             Dict[str, Any]: The validated response dictionary, with the content field updated to match the Pydantic model.
         """
@@ -149,7 +152,7 @@ class ValidationManager:
     ####################
     # VALIDATION OF STREAMS
     ####################
-    def validate_chat_completion_with_stream(self, chunk: Dict[str, Any], pydantic_model: Type[BaseModel]) -> Dict[str, Any]:
+    def validate_chat_completion_with_stream(self, chunk: Iterator[Mapping[str, Any]], pydantic_model: Type[BaseModel]) -> Iterator[Mapping[str, Any]]:
         ic()
         data = chunk['message']['content']
         fallback_data = {}

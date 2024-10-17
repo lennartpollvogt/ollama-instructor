@@ -1,16 +1,14 @@
 # prompt_manager.py
 
+from ollama._types import Message
 from pydantic import BaseModel
-from typing import List, Dict, Type, Any, Literal
+from typing import List, Dict, Type, Any, Literal, Sequence, Mapping, Iterator
 import json
 
 class ChatPromptManager:
     def __init__(self):
-        self.message_history: List
+        self.message_history: List[Message]
 
-    ####################
-    # BASIC PROMPT
-    ####################
     def basic_prompt(self, pydantic_model: Type[BaseModel]):
         '''
         Creates a basic prompt for the LLM based on the given Pydantic model.
@@ -22,19 +20,19 @@ class ChatPromptManager:
             str: The basic prompt.
         '''
         default_system_prompt = f'''
-You are the world class algorithm for JSON responses. You will get provided a JSON schema of a Pydantic model. Your task is to extract those in this JSON schema specified properties out of a given text or image (or its context) and return a VALID JSON response adhering to the JSON schema.
-    \nHere is the JSON schema: {pydantic_model.model_json_schema()}.
-    \n\nYou WILL return the instance of the JSON schema with the CORRECT extracted data, NOT the JSON schema itself. The instance of the JSON schema has the following fields to extract the data for: {list(pydantic_model.model_fields.keys())}.
+        You are the world class algorithm for JSON responses. You will get provided a JSON schema of a Pydantic model. Your task is to extract those in this JSON schema specified properties out of a given text or image (or its context) and return a VALID JSON response adhering to the JSON schema.
+        \nHere is the JSON schema: {pydantic_model.model_json_schema()}.
+        \n\nYou WILL return the instance of the JSON schema with the CORRECT extracted data, NOT the JSON schema itself. The instance of the JSON schema has the following fields to extract the data for: {list(pydantic_model.model_fields.keys())}.
         '''
         return default_system_prompt
-    
+
     def basic_reasoning_prompt(self, pydantic_model: Type[BaseModel]): # TODO: make clear step by step instructions with Markdown
         default_system_prompt = f'''
         # Instructions
         \n
         ## Role
         \n
-        You are a world class assistant with strong reasoning capabilities. 
+        You are a world class assistant with strong reasoning capabilities.
         \n
         ## Step by step instructions
         \n
@@ -46,18 +44,15 @@ You are the world class algorithm for JSON responses. You will get provided a JS
         2. Reason step by step about the best values for the fields in the JSON response. Every field in the JSON response should be a valid value according to the JSON schema. Don't come up with random fields which are not properties of the JSON schema. Don't come up with values for the fields which are not valid according to the JSON schema.\n
         3. Provide a code block with the JSON response. The code block has to start with ```json and ends with ```. Do NOT come up with code examples of any programming language. Only respond the instance of the JSON schema withing the code block (```json ```) while adhering to the JSON schema.\n
 
-        ## The JSON schema 
+        ## The JSON schema
         \n
         Here is the JSON schema: {pydantic_model.model_json_schema()}.\n
         In the code block you WILL return the instance of the JSON schema with the CORRECT extracted data, NOT the JSON schema itself. The instance of the JSON schema has the following fields to extract the data for: {list(pydantic_model.model_fields.keys())}.
         '''
 
         return default_system_prompt
-    
-    ####################
-    # ERROR GUIDANCE PROMPT
-    ####################
-    def error_guidance_prompt(self, validation_error: bool | str | dict) -> Dict[str, Any]:
+
+    def error_guidance_prompt(self, validation_error: bool | str | dict) -> Message:
         '''
         This function creates an error guidance prompt for the LLM.
 
@@ -67,14 +62,14 @@ You are the world class algorithm for JSON responses. You will get provided a JS
         Returns:
             Dict[str, Any]: The error guidance prompt as a message (dict).
         '''
-        error_guidance_prompt = {
+        error_guidance_prompt: Message = {
                                     'role': 'system',
                                     'content': f'The last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON and fill in the correct data while adhering the context and the JSON schema above! Make sure to adhere to given enums and choose the most likely value if value is required.'
                                 }
         return error_guidance_prompt
-    
-    def error_guidance_prompt_for_reasoning(self, validation_error: bool | str | dict) -> Dict[str, Any]:
-        '''
+
+    def error_guidance_prompt_for_reasoning(self, validation_error: bool | str | dict) -> Message:
+        """
         This function creates an error guidance prompt for the LLM, when format = '' and reasoning is enabled.
 
         Args:
@@ -82,7 +77,7 @@ You are the world class algorithm for JSON responses. You will get provided a JS
 
         Returns:
             Dict[str, Any]: The error guidance prompt as a message (dict).
-        '''
+        """
         error_guidance_prompt = f'The code block of the last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON in the code block and fill in the correct data while adhering the context and the JSON schema above! A code block has to start with ```json and ends with ```. If you are not using a code block the validation will fail!'
 
         error_guidance_message = {
@@ -90,17 +85,14 @@ You are the world class algorithm for JSON responses. You will get provided a JS
                                     'content': error_guidance_prompt
                                 }
         return error_guidance_message
-    
-    ####################
-    # PROMPT HELPER FUNCTION
-    ####################
+
     def create_chat_prompt_for_json(
-            self,
-            pydantic_model: BaseModel,
-            messages: List[Dict[str, Any]],
-            format: Literal['json', '']
-    ) -> List[Dict[str, Any]]:
-        '''
+        self,
+        pydantic_model: Type[BaseModel],
+        messages: List[Message],
+        format: Literal['json', '']
+    ) -> List[Message]:
+        """
         Creates a chat prompt for the LLM based on the given Pydantic model.
         It will contain the system prompt as well, to instruct the LLM to response the instance of the JSON schema.
 
@@ -112,8 +104,8 @@ You are the world class algorithm for JSON responses. You will get provided a JS
 
         Returns:
             List[Dict[str, Any]]: The chat messages.
-        '''
-        chat_messages = messages
+        """
+        chat_messages: List[Message] = messages
         if format == 'json':
             basic_prompt = self.basic_prompt(pydantic_model=pydantic_model)
         elif format == '':

@@ -1,7 +1,8 @@
 # ollama_instructor_client.py
 
 import ollama
-from typing import Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping
+from ollama._types import Message
+from typing import Iterator, Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping, Sequence
 from pydantic import BaseModel, ValidationError
 import json
 from copy import deepcopy
@@ -79,7 +80,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         super().__init__(host, debug)
         self.ollama_client = ollama.Client(host=host)
 
-    def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Mapping[str, Any]:
+    def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Mapping[str, Any]:
         '''
         Create a chat completion with the LLM and validate the response with the provided Pydantic model.
 
@@ -167,7 +168,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         # TODO: Test the exception for retries
         #raise Exception("Retries exhausted and validation still fails.")
 
-    def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Generator[Dict[str, Any], None, None]:
+    def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Iterator[Mapping[str, Any]] | None:
         '''
         Chat with the model and validate the response with the provided Pydantic model.
 
@@ -223,7 +224,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
 
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
-        # start the while loop
+        # Start the while loop
         while self.validation_error is not False or self.retry_counter >= 0:
             if self.validation_error is not False:
                 self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt(validation_error=self.validation_error))
@@ -241,51 +242,62 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     **kwargs
                 )
                 for chunk in response:
-                    expanding_response += chunk['message']['content']
-                    chunk['message']['content'] = expanding_response
-                    # Validation block of chunks
-                    chunk = self.validation_manager.validate_chat_completion_with_stream(chunk=chunk, pydantic_model=pydantic_model)
-                    self.validation_error = self.validation_manager.validate_for_error_message(response=chunk, pydantic_model=pydantic_model)
-                    chunk = self.validation_manager.add_error_log_to_final_response(response=chunk, error_message=self.validation_error, raw_message=expanding_response)
-                    chunk['retries_left'] = self.retry_counter
-                    yield chunk
+                    # Ensure chunk is a dictionary
+                    if isinstance(chunk, dict) and 'message' in chunk and isinstance(chunk['message'], dict):
+                        expanding_response += chunk['message']['content']
+                        chunk['message']['content'] = expanding_response
+
+                        # Validation block of chunks
+                        chunk: Iterator[Mapping[str, Any]] = self.validation_manager.validate_chat_completion_with_stream(chunk=chunk, pydantic_model=pydantic_model)
+                        self.validation_error = self.validation_manager.validate_for_error_message(response=chunk, pydantic_model=pydantic_model)
+                        chunk = self.validation_manager.add_error_log_to_final_response(response=chunk, error_message=self.validation_error, raw_message=expanding_response)
+                        chunk['retries_left'] = self.retry_counter
+                        yield chunk
+                    else:
+                        print("Unexpected structure in chunk:", chunk)
 
                 # Append chat_history
-                self.chat_history += [chunk['message']]
-                # turn the final response into a str
-                chunk['message']['content'] = json.dumps(chunk['message']['content'])
-                ic()
-                ic(chunk)
-                # Validate the final response
-                if self.validation_error is not False:
-                    if self.retry_counter == 0:
-                        ic()
-                        if allow_partial:
-                            ic(allow_partial)
-                            try:
-                                chunk = self.validation_manager.validate_partial_model(response=chunk, pydantic_model=pydantic_model)
-                                ic()
-                                return chunk
-                            except ValidationError as e:
-                                print("Retries exhausted and validation still fails.")
-                                raise e
+                if isinstance(chunk, dict) and 'message' in chunk:
+                    self.chat_history += [chunk['message']]
+                else:
+                    print("Unexpected final chunk structure:", chunk)
+
+                # Turn the final response into a str
+                if isinstance(chunk, dict) and 'message' in chunk and isinstance(chunk['message'], dict):
+                    chunk['message']['content'] = json.dumps(chunk['message']['content'])
+                    ic()
+                    ic(chunk)
+
+                    # Validate the final response
+                    if self.validation_error is not False:
+                        if self.retry_counter == 0:
+                            ic()
+                            if allow_partial:
+                                ic(allow_partial)
+                                try:
+                                    chunk = self.validation_manager.validate_partial_model(response=chunk, pydantic_model=pydantic_model)
+                                    ic()
+                                    return chunk
+                                except ValidationError as e:
+                                    print("Retries exhausted and validation still fails.")
+                                    raise e
+                            else:
+                                ic(allow_partial)
+                                try:
+                                    chunk = self.validation_manager.validate_chat_completion(response=chunk, pydantic_model=pydantic_model)
+                                    ic(chunk)
+                                    return chunk
+                                except ValidationError as e:
+                                    ic()
+                                    print("Retries exhausted and validation still fails.")
+                                    raise e
                         else:
-                            ic(allow_partial)
-                            try:
-                                chunk = self.validation_manager.validate_chat_completion(response=chunk, pydantic_model=pydantic_model)
-                                ic(chunk)
-                                return chunk
-                            except ValidationError as e:
-                                ic()
-                                print("Retries exhausted and validation still fails.")
-                                raise e
+                            ic()
+                            self.retry_counter -= 1
                     else:
                         ic()
-                        self.retry_counter -= 1
-                else:
-                    ic()
-                    chunk['message']['content'] = json.loads(chunk['message']['content'])
-                    return chunk
+                        chunk['message']['content'] = json.loads(chunk['message']['content'])
+                        return chunk
             except Exception as e:
                 ic()
                 ic(e)
@@ -302,7 +314,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         if not self.debug:
             ic.disable()
 
-    async def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs):
+    async def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs):
         '''
         Create a chat completion with the LLM and validate the response with the provided Pydantic model.
 

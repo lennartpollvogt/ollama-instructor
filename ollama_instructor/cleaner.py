@@ -31,7 +31,7 @@ For transparency reasons I want to provide the sources:
 def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
     '''
     Creates a partial Pydantic model that accepts missing fields.
-    This is useful when validating streams of JSON data. 
+    This is useful when validating streams of JSON data.
     Otherwise, Pydantic would raise an error if a field is missing or JSON is malformed.
 
     Args:
@@ -48,7 +48,7 @@ def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
         new.annotation = Optional[field.annotation] # type: ignore
         return new.annotation, new
     return create_model(
-        f'Partial{pydantic_model.__name__}',
+         __model_name=f'Partial{pydantic_model.__name__}',
         __base__=pydantic_model,
         __module__=pydantic_model.__module__,
         **{
@@ -73,7 +73,7 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
     '''
     if isinstance(data, str):
         data = json.loads(data)
-    
+
     try:
         try:
             # Parse the data through the Pydantic model, which validates and constructs a model instance

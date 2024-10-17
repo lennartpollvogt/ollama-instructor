@@ -1,5 +1,6 @@
 import ollama
-from typing import Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping
+from ollama._types import Message
+from typing import Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping, Iterator, Sequence, AsyncIterator
 from pydantic import BaseModel, ValidationError
 import json
 from copy import deepcopy
@@ -19,9 +20,10 @@ class BaseOllamaInstructorClient:
         self.ollama_client = None
         self.validation_manager = ValidationManager()
         self.chat_prompt_manager = ChatPromptManager()
-        self.chat_history = []
+        self.chat_history: List[Message] = []
         self.retry_counter: int
         self.validation_error = None
+        self.error: ValidationError
 
         if not debug:
             ic.disable()
@@ -44,7 +46,7 @@ class BaseOllamaInstructorClient:
         self.retry_counter = retries
         self.chat_history = []
 
-    def create_prompt(self, pydantic_model: Type[BaseModel], messages: List[Dict[str, Any]], retries: int, format: Literal['json', '']):
+    def create_prompt(self, pydantic_model: Type[BaseModel], messages: List[Message], retries: int, format: Literal['json', '']):
         self.chat_history = self.chat_prompt_manager.create_chat_prompt_for_json(pydantic_model=pydantic_model, messages=messages, format=format)
 
     def update_prompt_with_error(self, format: Literal['json', '']):
@@ -53,8 +55,8 @@ class BaseOllamaInstructorClient:
         if self.validation_error is not None and format=='':
             self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt_for_reasoning(validation_error=self.validation_error))
 
-    def prepare_messages(self, retries: int):
-        messages = [self.chat_history[0], self.chat_history[1]]
+    def prepare_messages(self, retries: int) -> List[Message]:
+        messages: Sequence[Message] = [self.chat_history[0], self.chat_history[1]]
         if self.retry_counter != retries:
             messages.extend(self.chat_history[-2:])
         return messages
@@ -78,7 +80,7 @@ class BaseOllamaInstructorClient:
 
         return code_block
 
-    def handle_response(self, response: Dict[str, Any], pydantic_model: Type[BaseModel], allow_partial: bool, format: Literal['json', '']):
+    def handle_response(self, response: Mapping[str, Any] | AsyncIterator[Mapping[str, Any]], pydantic_model: Type[BaseModel], allow_partial: bool, format: Literal['json', '']) -> Mapping[str, Any] | AsyncIterator[Mapping[str, Any]]:
         ic(type(response['message']['content']))
         ic(response)
 
@@ -88,20 +90,20 @@ class BaseOllamaInstructorClient:
         self.chat_history.append(raw_response['message'])  # Store the raw message before modification
 
         if format == '':
-            content = response['message']['content']
+            content: str = response['message']['content']
             if isinstance(content, str):
                 content = self.extract_code_block(content)
                 ic(content)
                 if content == 'Code block not found' or content == 'Code block end not found':
-                    content: dict = {}
+                    partial_content = {}
                     # create empty dict with keys from pydantic model and set all values to None
                     for key in pydantic_model.model_fields:
-                        content[key] = None
+                        partial_content[key] = None
                     # convert content to string
-                    content = json.dumps(content)
-                    updated_response = {
+                    #content = json.dumps(content)
+                    updated_response: Message = {
                         'role': 'assistant',
-                        'content': f'```json\n{content}\n```'
+                        'content': f'```json\n{partial_content}\n```'
                     }
                     # replace the last message in chat_history with the updated content
                     self.chat_history[-1] = updated_response
@@ -171,7 +173,7 @@ class BaseOllamaInstructorClient:
         except Exception as e:
             self.validation_error = str(e)
 
-    def handle_stream_response(self, chunk: Dict[str, Any], pydantic_model: Type[BaseModel], allow_partial: bool) -> Dict[str, Any]:
+    def handle_stream_response(self, chunk: Iterator[Mapping[str, Any]], pydantic_model: Type[BaseModel], allow_partial: bool) -> Iterator[Mapping[str, Any]]:
         if self.validation_error is not False:
             if self.retry_counter == 0:
                 ic()
