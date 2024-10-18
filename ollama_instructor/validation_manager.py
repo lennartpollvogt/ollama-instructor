@@ -6,7 +6,6 @@ from partial_json_parser import loads
 #from partial_json_parser.options import STR, OBJ # activate during development of ollama-instructor
 from partial_json_parser.core.options import STR, OBJ # deactivate during development of ollama-instructor but activate before uploading to PyPI
 from promptools import extractors
-from icecream import ic
 from pydantic_core import ErrorDetails
 
 from .cleaner import clean_nested_data_with_error_dict, create_partial_model
@@ -45,11 +44,9 @@ class ValidationManager:
         }
         response['raw_message'] = raw_message
         if error_message is True:
-            ic()
             response['validation_error'] = None
             return response
         else:
-            ic()
             response['validation_error'] = str(error_message)
             return response
 
@@ -73,14 +70,11 @@ class ValidationManager:
         '''
         data = json.dumps(response['message']['content'])
         parsed_chunk_dict = json.loads(data)
-        ic()
         try:
             if pydantic_model.model_validate(obj=parsed_chunk_dict):
-                ic(False)
                 return False # return False, None # TODO: edit
                 #return False, None
         except ValidationError as e:
-            ic()
             return e.errors(include_url=False) # return True, e.errors(include_url=False # TODO: edit
             #return True, e.errors(include_url=False)
 
@@ -107,15 +101,12 @@ class ValidationManager:
         #parsed_chunk_dict = json.loads(data)
         parsed_chunk_dict = data
         partial_model = create_partial_model(pydantic_model=pydantic_model)
-        ic()
         try:
             #cleaned_data = self.clean_data(data=parsed_chunk_dict, model=partial_model)
             cleaned_data = clean_nested_data_with_error_dict(data=parsed_chunk_dict, pydantic_model=partial_model)
-            ic()
             response['message']['content'] = jsonable_encoder(cleaned_data)
             return response
         except ValidationError as e:
-            ic()
             raise e
 
     ####################
@@ -141,37 +132,30 @@ class ValidationManager:
         parsed_chunk_dict = data
         try:
             valid_data = pydantic_model.model_validate(parsed_chunk_dict)
-            ic()
             valid_data.model_dump(exclude_unset=True)
             response['message']['content'] = valid_data
             return response
         except ValidationError as e:
-            ic()
             raise e
 
     ####################
     # VALIDATION OF STREAMS
     ####################
     def validate_chat_completion_with_stream(self, chunk: Iterator[Mapping[str, Any]], pydantic_model: Type[BaseModel]) -> Iterator[Mapping[str, Any]]:
-        ic()
         data = chunk['message']['content']
         fallback_data = {}
         partial_pydantic_model = create_partial_model(pydantic_model=pydantic_model)
         try:
             parsed_chunk = loads(json_string=data, allow_partial=OBJ)
-            ic()
             valid_data = extractors.extract_json(text=data, expect=pydantic_model, fallback=partial_pydantic_model(**parsed_chunk).model_dump(), allow_partial=STR | OBJ)
-            ic()
             chunk['message']['content'] = jsonable_encoder(valid_data)
         except ValidationError as e:
-            ic()
             print('ValidationError', e)
             parsed_chunk = loads(json_string=data, allow_partial=OBJ)
             valid_data = extractors.extract_json(text=data, expect=pydantic_model, fallback=partial_pydantic_model(**fallback_data).model_dump(), allow_partial=OBJ)
             chunk['message']['content'] = jsonable_encoder(valid_data) #custom_encoder=Dict[Any, Any]
             chunk['validation_error'] = str(e.errors(include_url=False))
         except Exception as e:
-            ic()
             print('Exception', e)
             parsed_chunk = loads(json_string=data, allow_partial=OBJ)
             chunk['message']['content'] = jsonable_encoder(parsed_chunk)

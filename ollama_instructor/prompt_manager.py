@@ -80,7 +80,7 @@ class ChatPromptManager:
         """
         error_guidance_prompt = f'The code block of the last response raised the following validation error: {json.dumps(validation_error)}. Response with the corrected JSON in the code block and fill in the correct data while adhering the context and the JSON schema above! A code block has to start with ```json and ends with ```. If you are not using a code block the validation will fail!'
 
-        error_guidance_message = {
+        error_guidance_message: Message = {
                                     'role': 'system',
                                     'content': error_guidance_prompt
                                 }

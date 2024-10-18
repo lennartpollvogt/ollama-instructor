@@ -9,12 +9,10 @@ from copy import deepcopy
 import re
 import rich
 from fastapi.encoders import jsonable_encoder
-from icecream import ic
-ic.configureOutput(prefix='ollama-instrutor | ')
 
 from ollama_instructor.prompt_manager import ChatPromptManager
 from ollama_instructor.validation_manager import ValidationManager
-from ollama_instructor.base_client import BaseOllamaInstructorClient
+from ollama_instructor.base_client import BaseOllamaInstructorClient, logger
 
 class OllamaInstructorClient(BaseOllamaInstructorClient):
     '''
@@ -135,20 +133,19 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             ```
         '''
         # Reset state
+        logger.debug("Reset state")
         self.reset_states(retries=retries)
-
+        logger.debug("Create prompt")
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
+        logger.debug("Start while loop")
         while self.validation_error is not False and self.retry_counter > 0:
-            ic(self.retry_counter)
             self.update_prompt_with_error(format=format)
-            ic(self.chat_history)
-            #rich.print(self.chat_history)
 
             try:
-                ic()
+                logger.debug("Prepare message and set left retries")
                 messages = self.prepare_messages(retries)
-                ic()
+                logger.debug("Request ollama client")
                 response = self.ollama_client.chat(
                     model=model,
                     messages=messages,
@@ -156,14 +153,12 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     stream=False,
                     **kwargs
                 )
-                #rich.print(response)
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
                 except ValidationError as e:
                     self.retry_counter -= 1
 
             except Exception as e:
-                ic()
                 raise e
         # TODO: Test the exception for retries
         #raise Exception("Retries exhausted and validation still fails.")
@@ -220,8 +215,9 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             # {'name': 'Jason', 'age': 45, 'gender': 'male'}
         '''
         # Reset state
+        logger.debug("Reset state")
         self.reset_states(retries=retries)
-
+        logger.debug("Create prompt")
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
         # Start the while loop
@@ -230,10 +226,9 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                 self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt(validation_error=self.validation_error))
             expanding_response = ""
             try:
-                ic()
-                messages = self.prepare_messages(retries=retries)
-                ic(messages)
-                ic(type(messages))
+                logger.debug("Prepare message and set left retries")
+                messages = self.prepare_messages(retries)
+                logger.debug("Request ollama client")
                 response = self.ollama_client.chat(
                     model=model,
                     messages=messages,
@@ -241,6 +236,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     stream=True,
                     **kwargs
                 )
+                logger.debug("Process chunks in for-loop")
                 for chunk in response:
                     # Ensure chunk is a dictionary
                     if isinstance(chunk, dict) and 'message' in chunk and isinstance(chunk['message'], dict):
@@ -265,42 +261,30 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                 # Turn the final response into a str
                 if isinstance(chunk, dict) and 'message' in chunk and isinstance(chunk['message'], dict):
                     chunk['message']['content'] = json.dumps(chunk['message']['content'])
-                    ic()
-                    ic(chunk)
 
                     # Validate the final response
                     if self.validation_error is not False:
                         if self.retry_counter == 0:
-                            ic()
                             if allow_partial:
-                                ic(allow_partial)
                                 try:
                                     chunk = self.validation_manager.validate_partial_model(response=chunk, pydantic_model=pydantic_model)
-                                    ic()
                                     return chunk
                                 except ValidationError as e:
                                     print("Retries exhausted and validation still fails.")
                                     raise e
                             else:
-                                ic(allow_partial)
                                 try:
                                     chunk = self.validation_manager.validate_chat_completion(response=chunk, pydantic_model=pydantic_model)
-                                    ic(chunk)
                                     return chunk
                                 except ValidationError as e:
-                                    ic()
                                     print("Retries exhausted and validation still fails.")
                                     raise e
                         else:
-                            ic()
                             self.retry_counter -= 1
                     else:
-                        ic()
                         chunk['message']['content'] = json.loads(chunk['message']['content'])
                         return chunk
             except Exception as e:
-                ic()
-                ic(e)
                 raise e
 
 class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
@@ -311,8 +295,6 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         self.ollama_client = ollama.AsyncClient(host=self.host)
         self.validation_manager = ValidationManager()
         self.chat_prompt_manager = ChatPromptManager()
-        if not self.debug:
-            ic.disable()
 
     async def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs):
         '''
@@ -382,19 +364,19 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         ```
         '''
         # Reset state
+        logger.debug("Reset state")
         self.reset_states(retries=retries)
+        logger.debug("Create prompt")
+        self.create_prompt(pydantic_model, messages, retries, format=format)
 
-        self.create_prompt(pydantic_model=pydantic_model, messages=messages, retries=retries, format=format)
-
+        logger.debug("Start while loop")
         while self.validation_error is not False and self.retry_counter > 0:
-            ic(self.retry_counter)
             self.update_prompt_with_error(format=format)
-            ic(self.chat_history)
 
             try:
-                ic()
+                logger.debug("Prepare message and set left retries")
                 messages = self.prepare_messages(retries)
-                ic()
+                logger.debug("Request ollama client")
                 response = await self.ollama_client.chat(
                     model=model,
                     messages=messages,
@@ -408,5 +390,4 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
                     self.retry_counter -= 1
 
             except Exception as e:
-                ic()
                 raise e

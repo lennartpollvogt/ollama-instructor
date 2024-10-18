@@ -6,9 +6,6 @@ from pydantic.fields import FieldInfo
 from copy import deepcopy
 import json
 
-from icecream import ic
-
-
 '''
 NOTE:
 The function "create_partial_model" in the following was created with the research and help of Phind-70b from www.phind.com.
@@ -40,9 +37,7 @@ def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
     Returns:
         Type[BaseModel]: The partial Pydantic model which now accepts missing fields.
     '''
-    ic()
     def make_field_optional(field: FieldInfo, default: Any = None) -> Tuple[Any, FieldInfo]:
-        ic()
         new = deepcopy(field)
         new.default = default
         new.annotation = Optional[field.annotation] # type: ignore
@@ -78,14 +73,11 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
         try:
             # Parse the data through the Pydantic model, which validates and constructs a model instance
             model_instance = pydantic_model.model_validate(data)
-            ic()
             # Convert the validated model instance back to a dictionary, excluding any undefined model fields
             cleaned_data = model_instance.model_dump(exclude_unset=True)
-            ic()
             return cleaned_data
         except ValidationError as e:
             error_dict = e.errors(include_url=False)
-            ic()
             # Recursive function to navigate through the nested data structure and set values to None or remove them
             def set_nested_value(data: Any, loc: tuple, error_type: str):
                 for key in loc[:-1]:
@@ -103,14 +95,11 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
                         data[loc[-1]] = None
                     elif isinstance(data, list):
                         data[int(loc[-1])] = None
-            ic()
             # Iterate over each error and handle it
             for item in error_dict:
                 loc = item['loc']
                 error_type = item['type']
                 set_nested_value(data, loc, error_type)
-            ic()
             return data
     except Exception as e:
-        ic()
         raise e
