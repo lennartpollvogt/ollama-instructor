@@ -175,7 +175,7 @@ The classes `OllamaInstructorClient` and `OllamaInstructorAsyncClient` are the m
 - `host`: the URL of the Ollama server (default: `http://localhost:11434`). See documentation of [Ollama](https://github.com/ollama/ollama)
 - `debug`: a `bool` indicating whether to print debug messages (default: `False`).
 
-> **Note**: I am currently working with `iceream` for the debug messages. Will try to improve that in further development of this library.
+> **Note**: Until versions (`v0.4.2`) I was working with `icecream` for debugging. I switched to the `logging` module.
 
 ### chat_completion & chat_completion_with_stream
 
