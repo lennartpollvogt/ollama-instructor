@@ -13,8 +13,11 @@ from ollama_instructor.prompt_manager import ChatPromptManager
 from ollama_instructor.validation_manager import ValidationManager
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('ollama-instructor')
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class BaseOllamaInstructorClient:
     def __init__(self, host: str = 'http://localhost:11434', debug: bool = False):

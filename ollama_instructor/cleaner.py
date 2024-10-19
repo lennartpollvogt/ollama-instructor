@@ -5,6 +5,14 @@ from pydantic import BaseModel, ValidationError, create_model
 from pydantic.fields import FieldInfo
 from copy import deepcopy
 import json
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 '''
 NOTE:
@@ -37,6 +45,7 @@ def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
     Returns:
         Type[BaseModel]: The partial Pydantic model which now accepts missing fields.
     '''
+    logger.debug("Create partial Pydantic model")
     def make_field_optional(field: FieldInfo, default: Any = None) -> Tuple[Any, FieldInfo]:
         new = deepcopy(field)
         new.default = default
@@ -66,6 +75,7 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
     Returns:
         Dict[str, Any]: A dictionary with the cleaned data.
     '''
+    logger.debug("Clean response by ValidationError message")
     if isinstance(data, str):
         data = json.loads(data)
 

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ValidationError
 from typing import Dict, Any, Type, Mapping, Iterator, List
 import json
+import logging
 from fastapi.encoders import jsonable_encoder
 from partial_json_parser import loads
 #from partial_json_parser.options import STR, OBJ # activate during development of ollama-instructor
@@ -9,6 +10,13 @@ from promptools import extractors
 from pydantic_core import ErrorDetails
 
 from .cleaner import clean_nested_data_with_error_dict, create_partial_model
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class ValidationManager:
     '''
@@ -35,6 +43,7 @@ class ValidationManager:
         Returns:
             the updated response with the error message and the raw message added
         '''
+        logger.debug("Add error log to final response")
         if raw_message is isinstance(raw_message, dict):
             raw_message = json.dumps(raw_message)
         raw_message = {
@@ -68,6 +77,7 @@ class ValidationManager:
         Returns:
             `False` or `ValidationError`
         '''
+        logger.debug("Validate for error message")
         data = json.dumps(response['message']['content'])
         parsed_chunk_dict = json.loads(data)
         try:
@@ -97,6 +107,7 @@ class ValidationManager:
         Returns:
             Dict[str, Any]: the cleand version of the final response
         '''
+        logger.debug("Validate partial model")
         data = response['message']['content']
         #parsed_chunk_dict = json.loads(data)
         parsed_chunk_dict = data
@@ -127,6 +138,7 @@ class ValidationManager:
         Returns:
             Dict[str, Any]: The validated response dictionary, with the content field updated to match the Pydantic model.
         """
+        logger.debug("Validate chat completion reponse")
         data = response['message']['content']
         #parsed_chunk_dict = json.loads(data)
         parsed_chunk_dict = data
@@ -142,6 +154,7 @@ class ValidationManager:
     # VALIDATION OF STREAMS
     ####################
     def validate_chat_completion_with_stream(self, chunk: Iterator[Mapping[str, Any]], pydantic_model: Type[BaseModel]) -> Iterator[Mapping[str, Any]]:
+        logger.debug("Validate chat completion response from stream")
         data = chunk['message']['content']
         fallback_data = {}
         partial_pydantic_model = create_partial_model(pydantic_model=pydantic_model)
