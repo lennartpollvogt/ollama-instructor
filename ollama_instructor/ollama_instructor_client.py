@@ -1,7 +1,7 @@
 # ollama_instructor_client.py
 
 import ollama
-from ollama._types import Message
+from ollama._types import Message, Options
 from typing import Iterator, Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping, Sequence
 from pydantic import BaseModel, ValidationError
 import json
@@ -78,7 +78,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         super().__init__(host, debug)
         self.ollama_client = ollama.Client(host=host)
 
-    def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Mapping[str, Any]:
+    def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None) -> Mapping[str, Any]:
         '''
         Create a chat completion with the LLM and validate the response with the provided Pydantic model.
 
@@ -151,7 +151,8 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     messages=messages,
                     format=format,
                     stream=False,
-                    **kwargs
+                    options=options,
+                    keep_alive=keep_alive
                 )
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
@@ -163,7 +164,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         # TODO: Test the exception for retries
         #raise Exception("Retries exhausted and validation still fails.")
 
-    def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs) -> Iterator[Mapping[str, Any]] | None:
+    def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None) -> Iterator[Mapping[str, Any]] | None:
         '''
         Chat with the model and validate the response with the provided Pydantic model.
 
@@ -234,7 +235,8 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     messages=messages,
                     format=format,
                     stream=True,
-                    **kwargs
+                    options=options,
+                    keep_alive=keep_alive
                 )
                 logger.debug("Process chunks in for-loop")
                 for chunk in response:
@@ -296,7 +298,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         self.validation_manager = ValidationManager()
         self.chat_prompt_manager = ChatPromptManager()
 
-    async def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, **kwargs):
+    async def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None):
         '''
         Create a chat completion with the LLM and validate the response with the provided Pydantic model.
 
@@ -382,7 +384,8 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
                     messages=messages,
                     format=format,
                     stream=False,
-                    **kwargs
+                    options=options,
+                    keep_alive=keep_alive
                 )
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)

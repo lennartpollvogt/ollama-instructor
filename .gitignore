@@ -159,7 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 async_stream_test.py
-async_test.py
+test_async.py
 test.py
 .python-version
 test_list.py

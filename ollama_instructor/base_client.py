@@ -143,7 +143,7 @@ class BaseOllamaInstructorClient:
 
     def validate_and_return_response(self, response: Mapping[str, Any],
                                      pydantic_model: Type[BaseModel],
-                                     allow_partial: bool) -> Mapping[str, Any]:
+                                     allow_partial: bool) -> Mapping[str, Any] | AsyncIterator[Mapping[str, Any]]:
         if self.validation_error is False:
             response['retries_left'] = self.retry_counter
             return response
@@ -163,6 +163,6 @@ class BaseOllamaInstructorClient:
                           pydantic_model: Type[BaseModel],
                           allow_partial: bool) -> Mapping[str, Any]:
         validator = self.validation_manager.validate_partial_model if allow_partial else self.validation_manager.validate_chat_completion
-        validated_response: Mapping[str, Any] | Iterator[Mapping[str, Any]] = validator(response, pydantic_model)
+        validated_response: Mapping[str, Any] | AsyncIterator[Mapping[str, Any]] = validator(response, pydantic_model)
         validated_response['retries_left'] = self.retry_counter
         return validated_response
