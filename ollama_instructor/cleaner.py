@@ -7,12 +7,8 @@ from copy import deepcopy
 import json
 import logging
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
-)
-logger = logging.getLogger(__name__)
+from .log_config import logger
+
 
 '''
 NOTE:
@@ -45,7 +41,9 @@ def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
     Returns:
         Type[BaseModel]: The partial Pydantic model which now accepts missing fields.
     '''
-    logger.debug("Create partial Pydantic model")
+    # logging
+    logger.debug(msg=f'def {create_partial_model.__name__}')
+    # functionality
     def make_field_optional(field: FieldInfo, default: Any = None) -> Tuple[Any, FieldInfo]:
         new = deepcopy(field)
         new.default = default
@@ -75,7 +73,9 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
     Returns:
         Dict[str, Any]: A dictionary with the cleaned data.
     '''
-    logger.debug("Clean response by ValidationError message")
+    # logging
+    logger.debug(msg=f'def {clean_nested_data_with_error_dict.__name__}')
+    # functionality
     if isinstance(data, str):
         data = json.loads(data)
 
@@ -90,6 +90,9 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
             error_dict = e.errors(include_url=False)
             # Recursive function to navigate through the nested data structure and set values to None or remove them
             def set_nested_value(data: Any, loc: tuple, error_type: str):
+                # logging
+                logger.debug(msg=f'def {set_nested_value.__name__}')
+                # functionality
                 for key in loc[:-1]:
                     if isinstance(data, dict):
                         data = data[key]

@@ -7,17 +7,11 @@ from copy import deepcopy
 import re
 import rich
 from fastapi.encoders import jsonable_encoder
-import logging
 
-from ollama_instructor.prompt_manager import ChatPromptManager
-from ollama_instructor.validation_manager import ValidationManager
+from .prompt_manager import ChatPromptManager
+from .validation_manager import ValidationManager
+from .log_config import logger, logging
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 class BaseOllamaInstructorClient:
     def __init__(self, host: str = 'http://localhost:11434', debug: bool = False):
@@ -50,21 +44,34 @@ class BaseOllamaInstructorClient:
             retries (int): The number of retries to set for the request.
                            This will be stored in the `retry_counter` attribute.
         '''
+        # logging
+        logger.debug(msg=f'def {self.reset_states.__name__}')
+        # functionality
         self.validation_error = None
         self.retry_counter = retries
         self.chat_history = []
 
     # PROMPTING
     def create_prompt(self, pydantic_model: Type[BaseModel], messages: List[Message], retries: int, format: Literal['json', '']):
+        # logging
+        logger.debug(msg=f'def {self.create_prompt.__name__}')
+        # functionality
         self.chat_history = self.chat_prompt_manager.create_chat_prompt_for_json(pydantic_model=pydantic_model, messages=messages, format=format)
 
     def update_prompt_with_error(self, format: Literal['json', '']):
+        # logging
+        logger.debug(msg=f'def {self.update_prompt_with_error.__name__}')
+        # fuctionality
         if self.validation_error is not None and format=='json':
+            logger.info(msg=f'Validation error! Retries left: {self.retry_counter}')
             self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt(validation_error=self.validation_error))
         if self.validation_error is not None and format=='':
             self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt_for_reasoning(validation_error=self.validation_error))
 
     def prepare_messages(self, retries: int) -> List[Message]:
+        # logging
+        logger.debug(msg=f'def {self.prepare_messages.__name__}')
+        # fuctionality
         messages: Sequence[Message] = [self.chat_history[0], self.chat_history[1]]
         if self.retry_counter != retries:
             messages.extend(self.chat_history[-2:])
@@ -73,7 +80,9 @@ class BaseOllamaInstructorClient:
 
     # RESPONSE HANDLING
     def extract_code_block(self, content: str) -> str:
-        logger.debug("Extracting JSON code block")
+        # logging
+        logger.debug(msg=f'def {self.extract_code_block.__name__}')
+        # fuctionality
         start = content.find('```json')
         if start == -1:
             logger.warning("No JSON code block found")
@@ -94,16 +103,17 @@ class BaseOllamaInstructorClient:
         # Remove empty lines
         code_block = '\n'.join(line for line in code_block.splitlines() if line.strip())
 
-        logger.debug(f"Extracted code block: {code_block}")
+        logger.debug(f'Extracted code block: {code_block}')
         return code_block
 
     def handle_response(self, response: Mapping[str, Any] | AsyncIterator[Mapping[str, Any]],
                         pydantic_model: Type[BaseModel], allow_partial: bool,
                         format: Literal['json', '']) -> Mapping[str, Any] | AsyncIterator[Mapping[str, Any]]:
-        logger.debug("Handling response")
+        # logging
+        logger.debug(msg=f'def {self.handle_response.__name__}')
+        # fuctionality
 
         if isinstance(response, AsyncIterator):
-            logger.warning("AsyncIterator response not fully supported")
             return response
 
         raw_response = response['message']['content']
@@ -121,6 +131,9 @@ class BaseOllamaInstructorClient:
         return self.validate_and_return_response(response, pydantic_model, allow_partial)
 
     def process_content(self, content: str, format: str, pydantic_model: Type[BaseModel]) -> str:
+        # logging
+        logger.debug(msg=f'def {self.process_content.__name__}')
+        # fuctionality
         if format == '':
             content = self.extract_code_block(content)
             if content == '{}':
@@ -129,6 +142,9 @@ class BaseOllamaInstructorClient:
         return jsonable_encoder(content)
 
     def create_empty_model_dict(self, pydantic_model: Type[BaseModel]) -> Message:
+        # logging
+        logger.debug(msg=f'def {self.create_empty_model_dict.__name__}')
+        # fuctionality
         content: dict = {key: None for key in pydantic_model.model_fields}
 
         updated_response: Message = {
@@ -138,6 +154,9 @@ class BaseOllamaInstructorClient:
         return updated_response
 
     def extract_json(self, content: str) -> dict:
+        # logging
+        logger.debug(msg=f'def {self.extract_json.__name__}')
+        # fuctionality
         try:
             return json.loads(content)
         except json.JSONDecodeError:
@@ -147,6 +166,9 @@ class BaseOllamaInstructorClient:
     def validate_and_return_response(self, response: Mapping[str, Any],
                                      pydantic_model: Type[BaseModel],
                                      allow_partial: bool) -> Mapping[str, Any] | AsyncIterator[Mapping[str, Any]]:
+        # logging
+        logger.debug(msg=f'def {self.validate_and_return_response.__name__}')
+        # fuctionality
         if self.validation_error is False:
             response['retries_left'] = self.retry_counter
             return response
@@ -160,11 +182,14 @@ class BaseOllamaInstructorClient:
                 raise Exception("Retries exhausted and validation still fails.")
         except ValidationError as e:
             logger.error(f"Validation error: {e}")
-            raise
+            raise e
 
     def validate_response(self, response: Mapping[str, Any],
                           pydantic_model: Type[BaseModel],
                           allow_partial: bool) -> Mapping[str, Any]:
+        # logging
+        logger.debug(msg=f'def {self.validate_response.__name__}')
+        # fuctionality
         validator = self.validation_manager.validate_partial_model if allow_partial else self.validation_manager.validate_chat_completion
         validated_response: Mapping[str, Any] | AsyncIterator[Mapping[str, Any]] = validator(response, pydantic_model)
         validated_response['retries_left'] = self.retry_counter

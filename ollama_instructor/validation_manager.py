@@ -10,13 +10,8 @@ from promptools import extractors
 from pydantic_core import ErrorDetails
 
 from .cleaner import clean_nested_data_with_error_dict, create_partial_model
+from .log_config import logger
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 class ValidationManager:
     '''
@@ -43,7 +38,9 @@ class ValidationManager:
         Returns:
             the updated response with the error message and the raw message added
         '''
-        logger.debug("Add error log to final response")
+        # logging
+        logger.debug(msg=f'def {self.add_error_log_to_final_response.__name__}')
+        # functionality
         if raw_message is isinstance(raw_message, dict):
             raw_message = json.dumps(raw_message)
         raw_message = {
@@ -77,7 +74,9 @@ class ValidationManager:
         Returns:
             `False` or `ValidationError`
         '''
-        logger.debug("Validate for error message")
+        # logging
+        logger.debug(msg=f'def {self.validate_for_error_message.__name__}')
+        # functionality
         data = json.dumps(response['message']['content'])
         parsed_chunk_dict = json.loads(data)
         try:
@@ -107,7 +106,9 @@ class ValidationManager:
         Returns:
             Dict[str, Any]: the cleand version of the final response
         '''
-        logger.debug("Validate partial model")
+        # logging
+        logger.debug(msg=f'def {self.validate_partial_model.__name__}')
+        # functionality
         data = response['message']['content']
         #parsed_chunk_dict = json.loads(data)
         parsed_chunk_dict = data
@@ -138,7 +139,9 @@ class ValidationManager:
         Returns:
             Dict[str, Any]: The validated response dictionary, with the content field updated to match the Pydantic model.
         """
-        logger.debug("Validate chat completion reponse")
+        # logging
+        logger.debug(msg=f'def {self.validate_chat_completion.__name__}')
+        # functionality
         data = response['message']['content']
         #parsed_chunk_dict = json.loads(data)
         parsed_chunk_dict = data
@@ -154,7 +157,9 @@ class ValidationManager:
     # VALIDATION OF STREAMS
     ####################
     def validate_chat_completion_with_stream(self, chunk: Iterator[Mapping[str, Any]], pydantic_model: Type[BaseModel]) -> Iterator[Mapping[str, Any]]:
-        logger.debug("Validate chat completion response from stream")
+        # logging
+        logger.debug(msg=f'def {self.validate_chat_completion_with_stream.__name__}')
+        # functionality
         data = chunk['message']['content']
         fallback_data = {}
         partial_pydantic_model = create_partial_model(pydantic_model=pydantic_model)

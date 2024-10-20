@@ -10,9 +10,11 @@ import re
 import rich
 from fastapi.encoders import jsonable_encoder
 
-from ollama_instructor.prompt_manager import ChatPromptManager
-from ollama_instructor.validation_manager import ValidationManager
-from ollama_instructor.base_client import BaseOllamaInstructorClient, logger
+from .prompt_manager import ChatPromptManager
+from .validation_manager import ValidationManager
+from .base_client import BaseOllamaInstructorClient # , logger
+
+from .log_config import logger
 
 class OllamaInstructorClient(BaseOllamaInstructorClient):
     '''
@@ -132,10 +134,10 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             # {'name': 'Jason', 'age': 45, 'gender': 'male'}
             ```
         '''
-        # Reset state
-        logger.debug("Reset state")
+        # logging
+        logger.debug(msg=f'def {self.chat_completion.__name__}')
+        # functionality
         self.reset_states(retries=retries)
-        logger.debug("Create prompt")
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
         logger.debug("Start while loop")
@@ -215,10 +217,10 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             # >>> Output example:
             # {'name': 'Jason', 'age': 45, 'gender': 'male'}
         '''
-        # Reset state
-        logger.debug("Reset state")
+        # logging
+        logger.debug(msg=f'def {self.chat_completion_with_stream.__name__}')
+        # functionality
         self.reset_states(retries=retries)
-        logger.debug("Create prompt")
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
         # Start the while loop
@@ -365,10 +367,10 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
             asyncio.run(main())
         ```
         '''
-        # Reset state
-        logger.debug("Reset state")
+        # logging
+        logger.debug(msg=f'def {self.chat_completion.__name__}')
+        # functionality
         self.reset_states(retries=retries)
-        logger.debug("Create prompt")
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
         logger.debug("Start while loop")
@@ -376,9 +378,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
             self.update_prompt_with_error(format=format)
 
             try:
-                logger.debug("Prepare message and set left retries")
                 messages = self.prepare_messages(retries)
-                logger.debug("Request ollama client")
                 response = await self.ollama_client.chat(
                     model=model,
                     messages=messages,
