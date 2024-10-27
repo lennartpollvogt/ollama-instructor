@@ -10,7 +10,7 @@ Asynchronous programming, particularly using Python's `asyncio` library, allows 
 AsyncIO is a library for writing single-threaded concurrent code using coroutines, multiplexing I/O access over sockets and other resources, running network clients and servers, and other related primitives.
 
 ### Ollama-Instructor Client
-The `ollama-instructor` client allows you to interact with the Ollama model for generating JSON structured outputs based on input messages. By using async operations, you can send multiple requests simultaneously.
+The `ollama-instructor` async client allows you to interact with the Ollama for generating JSON structured outputs based on input messages. By using async operations, you can send multiple requests simultaneously.
 
 ## Example Implementation
 
@@ -91,7 +91,7 @@ Output:
 {'name': 'Bob', 'age': 28, 'gender': 'male', 'friends': []}
 ```
 
-You will recommend that the responses will come more or less simultanousely.
+You will recognize that the responses will return more or less simultanousely.
 
 > Ollama is able to handle async operations. By using the same model for all requests this only needs a tiny bit more memory of you machine.
 
