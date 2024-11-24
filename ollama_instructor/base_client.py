@@ -49,7 +49,7 @@ class BaseOllamaInstructorClient:
         self.chat_history = []
 
     # PROMPTING
-    def create_prompt(self, pydantic_model: Type[BaseModel], messages: List[Message], retries: int, format: Literal['json', '']):
+    def create_prompt(self, pydantic_model: Type[BaseModel], messages: Sequence[Mapping[str, Any] | Message], retries: int, format: Literal['json', '']):
         # logging
         logger.debug(msg=f'def {self.create_prompt.__name__}')
         # functionality
@@ -69,7 +69,7 @@ class BaseOllamaInstructorClient:
         # logging
         logger.debug(msg=f'def {self.prepare_messages.__name__}')
         # fuctionality
-        messages: Sequence[Message] = [self.chat_history[0], self.chat_history[1]]
+        messages: Sequence[Mapping[str, Any] | Message] = [self.chat_history[0], self.chat_history[1]]
         if self.retry_counter != retries:
             messages.extend(self.chat_history[-2:])
         logger.debug(msg=f'messages have the following type: {type(messages)}')

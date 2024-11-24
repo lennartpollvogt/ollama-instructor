@@ -5,7 +5,6 @@ from pydantic import BaseModel, ValidationError, create_model
 from pydantic.fields import FieldInfo
 from copy import deepcopy
 import json
-import logging
 
 from .log_config import logger
 
@@ -44,20 +43,25 @@ def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
     # logging
     logger.debug(msg=f'def {create_partial_model.__name__}')
     # functionality
-    def make_field_optional(field: FieldInfo, default: Any = None) -> Tuple[Any, FieldInfo]:
+    def make_field_optional(field: FieldInfo) -> Tuple[Type, FieldInfo]:
         new = deepcopy(field)
-        new.default = default
-        new.annotation = Optional[field.annotation] # type: ignore
-        return new.annotation, new
-    return create_model(
-         __model_name=f'Partial{pydantic_model.__name__}',
+        new.default = None
+        # Make the type Optional
+        new_type = Optional[field.annotation] if field.annotation else Any
+        return new_type, new
+
+    fields = {
+        field_name: make_field_optional(field_info)
+        for field_name, field_info in pydantic_model.model_fields.items()
+    }
+
+    created_model = create_model(
+        f'Partial{pydantic_model.__name__}',
         __base__=pydantic_model,
-        __module__=pydantic_model.__module__,
-        **{
-            field_name: make_field_optional(field=field_info)
-            for field_name, field_info in pydantic_model.model_fields.items()
-        }
+        **fields
     )
+
+    return created_model
 
 def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]) -> Dict[str, Any]:
     '''

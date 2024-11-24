@@ -1,8 +1,11 @@
 # ollama_instructor_client.py
 
+from typing_extensions import deprecated
+from warnings import warn
+
 import ollama
 from ollama._types import Message, Options
-from typing import Iterator, Type, Any, Literal, List, Mapping
+from typing import Iterator, Type, Any, Literal, List, Mapping, Sequence
 from pydantic import BaseModel, ValidationError
 import json
 
@@ -76,7 +79,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         super().__init__(host, debug)
         self.ollama_client = ollama.Client(host=host)
 
-    def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None) -> Mapping[str, Any]:
+    def chat_completion(self, pydantic_model: Type[BaseModel], messages: Sequence[Mapping[str, Any] | Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None) -> Mapping[str, Any]:
         '''
         Create a chat completion with the LLM and validate the response with the provided Pydantic model.
 
@@ -163,8 +166,12 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
         # TODO: Test the exception for retries
         #raise Exception("Retries exhausted and validation still fails.")
 
-    def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None) -> Iterator[Mapping[str, Any]] | None:
+    @deprecated("The chat_completion_with_stream function is currently broken due to a dependency version update. Please use chat_completion instead until this is fixed.")
+    def chat_completion_with_stream(self, pydantic_model: Type[BaseModel], messages: Sequence[Mapping[str, Any] | Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None) -> Iterator[Mapping[str, Any]] | None:
         '''
+        WARNING: This method is currently broken due to a dependency version update.
+        Please use `chat_completion` instead until this is fixed.
+
         Chat with the model and validate the response with the provided Pydantic model.
 
         **This method is for streaming.** Use `chat_completion` instead.
@@ -297,7 +304,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         self.validation_manager = ValidationManager()
         self.chat_prompt_manager = ChatPromptManager()
 
-    async def chat_completion(self, pydantic_model: Type[BaseModel], messages: List[Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None):
+    async def chat_completion(self, pydantic_model: Type[BaseModel], messages: Sequence[Mapping[str, Any] | Message], model: str, retries: int = 3, format: Literal['', 'json'] = 'json', allow_partial: bool = False, options: Options | None = None, keep_alive: float | str | None = None):
         '''
         Create a chat completion with the LLM and validate the response with the provided Pydantic model.
 

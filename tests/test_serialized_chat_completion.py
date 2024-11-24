@@ -1,16 +1,17 @@
 '''
-This test series is for testing serializing requests to the ollama chat 
+This test series is for testing serializing requests to the ollama chat
 endpoint using ollama-instructor.
 
 In version 0.4.1 the chat_history, validation_error und retries of the clients
-(OllamaInstructorClient & OllamaInstructorAsyncClient) where not resetted if 
-you would use the same client instance. 
+(OllamaInstructorClient & OllamaInstructorAsyncClient) where not resetted if
+you would use the same client instance.
 This was causing error of "TypeError: 'NoneType' object is not subscriptable"
 '''
+# pytest test_serialized_chat_completion.py
+
 import pytest
 from pydantic import BaseModel, ConfigDict
 from enum import Enum
-from typing import List
 
 from ollama_instructor.ollama_instructor_client import OllamaInstructorAsyncClient, OllamaInstructorClient
 
@@ -92,10 +93,10 @@ def test_serializing_request():
         assert isinstance(response['name'], str)
         assert isinstance(response['age'], int)
         assert response['gender'] in [Gender.MALE.value, Gender.FEMALE.value]
-    
 
 
-# pytest test_serialized_chat_completion.py
+
+
 
 '''
 Expected output:

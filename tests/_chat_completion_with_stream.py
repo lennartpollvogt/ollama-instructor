@@ -1,7 +1,6 @@
 import pytest
 from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
 from pydantic import BaseModel, ConfigDict
-import json
 from enum import Enum
 from typing import List
 

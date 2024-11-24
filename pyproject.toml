@@ -28,9 +28,9 @@ classifiers = [
 
 
 [tool.poetry.dependencies]
-python = "^3.8"
-ollama = ">=0.2.0, <0.4.1"
-pydantic = "^2.7.1"
+python = "^3.10"
+ollama = ">=0.2.0, <0.4.2"
+pydantic = "^2.9.0"
 partial-json-parser = "^0.2.0"
 promptools = "^0.1.3.2"
 fastapi = "^0.110.2"

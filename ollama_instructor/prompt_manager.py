@@ -2,7 +2,7 @@
 
 from ollama._types import Message
 from pydantic import BaseModel
-from typing import List, Dict, Type, Any, Literal, Sequence, Mapping, Iterator
+from typing import List, Type, Any, Literal, Sequence, Mapping
 import json
 
 class ChatPromptManager:
@@ -89,7 +89,7 @@ class ChatPromptManager:
     def create_chat_prompt_for_json(
         self,
         pydantic_model: Type[BaseModel],
-        messages: List[Message],
+        messages: Sequence[Mapping[str, Any] | Message],
         format: Literal['json', '']
     ) -> List[Message]:
         """
