@@ -2,13 +2,9 @@
 
 import ollama
 from ollama._types import Message, Options
-from typing import Iterator, Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping, Sequence
+from typing import Iterator, Type, Any, Literal, List, Mapping
 from pydantic import BaseModel, ValidationError
 import json
-from copy import deepcopy
-import re
-import rich
-from fastapi.encoders import jsonable_encoder
 
 from .prompt_manager import ChatPromptManager
 from .validation_manager import ValidationManager
@@ -156,6 +152,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     options=options,
                     keep_alive=keep_alive
                 )
+                logger.debug(msg=f'Raw response: {response['message']['content']}')
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
                 except ValidationError as e:
@@ -387,6 +384,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
                     options=options,
                     keep_alive=keep_alive
                 )
+                logger.debug(msg=f'Raw response: {response['message']['content']}')
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
                 except ValidationError as e:

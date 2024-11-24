@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ValidationError
-from typing import Dict, Any, Type, Mapping, Iterator, List
+from typing import Any, Type, Mapping, Iterator, List
 import json
-import logging
 from fastapi.encoders import jsonable_encoder
 from partial_json_parser import loads
 #from partial_json_parser.options import STR, OBJ # activate during development of ollama-instructor
@@ -41,20 +40,21 @@ class ValidationManager:
         # logging
         logger.debug(msg=f'def {self.add_error_log_to_final_response.__name__}')
         # functionality
+        new_response = dict(response)
         if raw_message is isinstance(raw_message, dict):
             raw_message = json.dumps(raw_message)
         raw_message = {
             'role': 'assistant',
             #'content': json.dumps(raw_message)
-            'content': raw_message
+            'content': str(raw_message)
         }
-        response['raw_message'] = raw_message
+        new_response['raw_message'] = raw_message
         if error_message is True:
-            response['validation_error'] = None
-            return response
+            new_response['validation_error'] = str(None)
+            return new_response
         else:
-            response['validation_error'] = str(error_message)
-            return response
+            new_response['validation_error'] = str(error_message)
+            return new_response
 
     ####################
     # VALIDATION FUNCTIONS
@@ -77,15 +77,17 @@ class ValidationManager:
         # logging
         logger.debug(msg=f'def {self.validate_for_error_message.__name__}')
         # functionality
-        data = json.dumps(response['message']['content'])
-        parsed_chunk_dict = json.loads(data)
         try:
-            if pydantic_model.model_validate(obj=parsed_chunk_dict):
-                return False # return False, None # TODO: edit
-                #return False, None
+            data = response['message']['content']
+            if isinstance(data, str):
+                parsed_chunk_dict = json.loads(data)
+            else:
+                parsed_chunk_dict = data
+
+            pydantic_model.model_validate(obj=parsed_chunk_dict)
+            return False
         except ValidationError as e:
-            return e.errors(include_url=False) # return True, e.errors(include_url=False # TODO: edit
-            #return True, e.errors(include_url=False)
+            return e.errors(include_url=False)
 
     def validate_partial_model(
         self,
@@ -148,7 +150,7 @@ class ValidationManager:
         try:
             valid_data = pydantic_model.model_validate(parsed_chunk_dict)
             valid_data.model_dump(exclude_unset=True)
-            response['message']['content'] = valid_data
+            response['message']['content'] = json.dumps(valid_data)
             return response
         except ValidationError as e:
             raise e

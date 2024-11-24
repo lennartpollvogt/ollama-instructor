@@ -17,10 +17,9 @@ The `ollama-instructor` async client allows you to interact with the Ollama for 
 Let's take a look at an example implementation that demonstrates how to use `ollama-instructor` with async operations to make concurrent requests:
 
 ```python
-from typing_extensions import Any
 from pydantic import BaseModel, ConfigDict
 from enum import Enum
-from typing import List, Dict, Any
+from typing import List
 import rich
 import asyncio
 

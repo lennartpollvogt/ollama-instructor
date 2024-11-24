@@ -1,11 +1,8 @@
-import ollama
 from ollama._types import Message
-from typing import Type, Any, Dict, Literal, List, Generator, AsyncGenerator, Mapping, Iterator, Sequence, AsyncIterator
+from typing import Type, Any, Literal, List, Mapping, Sequence, AsyncIterator
 from pydantic import BaseModel, ValidationError
 import json
-from copy import deepcopy
 import re
-import rich
 from fastapi.encoders import jsonable_encoder
 
 from .prompt_manager import ChatPromptManager
@@ -75,6 +72,11 @@ class BaseOllamaInstructorClient:
         messages: Sequence[Message] = [self.chat_history[0], self.chat_history[1]]
         if self.retry_counter != retries:
             messages.extend(self.chat_history[-2:])
+        logger.debug(msg=f'messages have the following type: {type(messages)}')
+        logger.debug(msg='Convert content into strings')
+        for message in messages:
+            message['content'] = str(message['content'])
+        logger.debug(msg=f'Messages: {messages}')
         return messages
 
 

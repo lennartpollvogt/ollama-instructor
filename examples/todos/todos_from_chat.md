@@ -50,7 +50,7 @@ class TodoList(BaseModel):
     todos: List[Todo] = Field(..., description="A list of todo items for the market report project")
 
 # Initialize the OllamaInstructorClient
-client = OllamaInstructorClient(host='http://192.168.0.171:11434')
+client = OllamaInstructorClient()
 
 # The conversation to analyze
 conversation = """
@@ -117,7 +117,7 @@ identify trends.",
         },
         {
             'title': 'Research new market trends',
-            'description': 'Analyze recent reports and articles to stay up-to-date on 
+            'description': 'Analyze recent reports and articles to stay up-to-date on
 the latest market developments.',
             'assigned_person': 'Bob',
             'due_date': None
