@@ -42,7 +42,7 @@ class BaseOllamaInstructorClient:
                            This will be stored in the `retry_counter` attribute.
         '''
         # logging
-        logger.debug(msg=f'def {self.reset_states.__name__}')
+        logger.debug(msg=f"def {self.reset_states.__name__}")
         # functionality
         self.validation_error = None
         self.retry_counter = retries
@@ -51,50 +51,50 @@ class BaseOllamaInstructorClient:
     # PROMPTING
     def create_prompt(self, pydantic_model: Type[BaseModel], messages: Sequence[Mapping[str, Any] | Message], retries: int, format: Literal['json', '']):
         # logging
-        logger.debug(msg=f'def {self.create_prompt.__name__}')
+        logger.debug(msg=f"def {self.create_prompt.__name__}")
         # functionality
         self.chat_history = self.chat_prompt_manager.create_chat_prompt_for_json(pydantic_model=pydantic_model, messages=messages, format=format)
 
     def update_prompt_with_error(self, format: Literal['json', '']):
         # logging
-        logger.debug(msg=f'def {self.update_prompt_with_error.__name__}')
+        logger.debug(msg=f"def {self.update_prompt_with_error.__name__}")
         # fuctionality
         if self.validation_error is not None and format=='json':
-            logger.info(msg=f'Validation error! Retries left: {self.retry_counter}')
+            logger.info(msg=f"Validation error! Retries left: {self.retry_counter}")
             self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt(validation_error=self.validation_error))
         if self.validation_error is not None and format=='':
             self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt_for_reasoning(validation_error=self.validation_error))
 
     def prepare_messages(self, retries: int) -> List[Message]:
         # logging
-        logger.debug(msg=f'def {self.prepare_messages.__name__}')
+        logger.debug(msg=f"def {self.prepare_messages.__name__}")
         # fuctionality
         messages: Sequence[Mapping[str, Any] | Message] = [self.chat_history[0], self.chat_history[1]]
         if self.retry_counter != retries:
             messages.extend(self.chat_history[-2:])
-        logger.debug(msg=f'messages have the following type: {type(messages)}')
-        logger.debug(msg='Convert content into strings')
+        logger.debug(msg=f"messages have the following type: {type(messages)}")
+        logger.debug(msg="Convert content into strings")
         for message in messages:
             message['content'] = str(message['content'])
-        logger.debug(msg=f'Messages: {messages}')
+        logger.debug(msg=f"Messages: {messages}")
         return messages
 
 
     # RESPONSE HANDLING
     def extract_code_block(self, content: str) -> str:
         # logging
-        logger.debug(msg=f'def {self.extract_code_block.__name__}')
+        logger.debug(msg=f"def {self.extract_code_block.__name__}")
         # fuctionality
         start = content.find('```json')
         if start == -1:
             logger.warning("No JSON code block found")
-            return 'Code block not found'
+            return "Code block not found"
 
         start += len('```json\n')  # Move start to the end of '```json\n'
         end = content.find('```', start)
         if end == -1:
             logger.warning("JSON code block is not closed")
-            return 'Code block end not found'
+            return "Code block end not found"
 
         code_block = content[start:end]
 
@@ -105,14 +105,14 @@ class BaseOllamaInstructorClient:
         # Remove empty lines
         code_block = '\n'.join(line for line in code_block.splitlines() if line.strip())
 
-        logger.debug(f'Extracted code block: {code_block}')
+        logger.debug(f"Extracted code block: {code_block}")
         return code_block
 
     def handle_response(self, response: Mapping[str, Any] | AsyncIterator[Mapping[str, Any]],
                         pydantic_model: Type[BaseModel], allow_partial: bool,
                         format: Literal['json', '']) -> Mapping[str, Any] | AsyncIterator[Mapping[str, Any]]:
         # logging
-        logger.debug(msg=f'def {self.handle_response.__name__}')
+        logger.debug(msg=f"def {self.handle_response.__name__}")
         # fuctionality
 
         if isinstance(response, AsyncIterator):
@@ -134,7 +134,7 @@ class BaseOllamaInstructorClient:
 
     def process_content(self, content: str, format: str, pydantic_model: Type[BaseModel]) -> str:
         # logging
-        logger.debug(msg=f'def {self.process_content.__name__}')
+        logger.debug(msg=f"def {self.process_content.__name__}")
         # fuctionality
         if format == '':
             content = self.extract_code_block(content)
@@ -145,7 +145,7 @@ class BaseOllamaInstructorClient:
 
     def create_empty_model_dict(self, pydantic_model: Type[BaseModel]) -> Message:
         # logging
-        logger.debug(msg=f'def {self.create_empty_model_dict.__name__}')
+        logger.debug(msg=f"def {self.create_empty_model_dict.__name__}")
         # fuctionality
         content: dict = {key: None for key in pydantic_model.model_fields}
 
@@ -157,7 +157,7 @@ class BaseOllamaInstructorClient:
 
     def extract_json(self, content: str) -> dict:
         # logging
-        logger.debug(msg=f'def {self.extract_json.__name__}')
+        logger.debug(msg=f"def {self.extract_json.__name__}")
         # fuctionality
         try:
             return json.loads(content)
@@ -169,7 +169,7 @@ class BaseOllamaInstructorClient:
                                      pydantic_model: Type[BaseModel],
                                      allow_partial: bool) -> Mapping[str, Any] | AsyncIterator[Mapping[str, Any]]:
         # logging
-        logger.debug(msg=f'def {self.validate_and_return_response.__name__}')
+        logger.debug(msg=f"def {self.validate_and_return_response.__name__}")
         # fuctionality
         if self.validation_error is False:
             response['retries_left'] = self.retry_counter
@@ -190,7 +190,7 @@ class BaseOllamaInstructorClient:
                           pydantic_model: Type[BaseModel],
                           allow_partial: bool) -> Mapping[str, Any]:
         # logging
-        logger.debug(msg=f'def {self.validate_response.__name__}')
+        logger.debug(msg=f"def {self.validate_response.__name__}")
         # fuctionality
         validator = self.validation_manager.validate_partial_model if allow_partial else self.validation_manager.validate_chat_completion
         validated_response: Mapping[str, Any] | AsyncIterator[Mapping[str, Any]] = validator(response, pydantic_model)

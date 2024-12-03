@@ -38,7 +38,7 @@ class ValidationManager:
             the updated response with the error message and the raw message added
         '''
         # logging
-        logger.debug(msg=f'def {self.add_error_log_to_final_response.__name__}')
+        logger.debug(msg=f"def {self.add_error_log_to_final_response.__name__}")
         # functionality
         new_response = dict(response)
         if raw_message is isinstance(raw_message, dict):
@@ -75,7 +75,7 @@ class ValidationManager:
             `False` or `ValidationError`
         '''
         # logging
-        logger.debug(msg=f'def {self.validate_for_error_message.__name__}')
+        logger.debug(msg=f"def {self.validate_for_error_message.__name__}")
         # functionality
         try:
             data = response['message']['content']
@@ -109,7 +109,7 @@ class ValidationManager:
             Dict[str, Any]: the cleand version of the final response
         '''
         # logging
-        logger.debug(msg=f'def {self.validate_partial_model.__name__}')
+        logger.debug(msg=f"def {self.validate_partial_model.__name__}")
         # functionality
         data = response['message']['content']
         #parsed_chunk_dict = json.loads(data)
@@ -142,7 +142,7 @@ class ValidationManager:
             Dict[str, Any]: The validated response dictionary, with the content field updated to match the Pydantic model.
         """
         # logging
-        logger.debug(msg=f'def {self.validate_chat_completion.__name__}')
+        logger.debug(msg=f"def {self.validate_chat_completion.__name__}")
         # functionality
         data = response['message']['content']
         #parsed_chunk_dict = json.loads(data)
@@ -160,7 +160,7 @@ class ValidationManager:
     ####################
     def validate_chat_completion_with_stream(self, chunk: Iterator[Mapping[str, Any]], pydantic_model: Type[BaseModel]) -> Iterator[Mapping[str, Any]]:
         # logging
-        logger.debug(msg=f'def {self.validate_chat_completion_with_stream.__name__}')
+        logger.debug(msg=f"def {self.validate_chat_completion_with_stream.__name__}")
         # functionality
         data = chunk['message']['content']
         fallback_data = {}

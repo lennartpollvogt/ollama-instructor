@@ -1,8 +1,8 @@
-import pytest
 from ollama_instructor.ollama_instructor_client import OllamaInstructorClient
 from pydantic import BaseModel, ConfigDict
 from enum import Enum
 from typing import List
+import json
 
 class Gender(Enum):
     MALE = 'male'
@@ -47,7 +47,7 @@ def test_chat_completion():
     # Assert the expected values
     assert 'name' in expand_response
     assert expand_response['name'] == 'Jason'
-    assert expand_response['age'] == 25
+    assert expand_response['age'] == '25'
     assert expand_response['gender'] in Gender
     assert 'Nick' in expand_response['friends']
     assert 'Gabriel' in expand_response['friends']

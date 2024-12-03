@@ -1,13 +1,10 @@
 # ollama_instructor_client.py
-
 from typing_extensions import deprecated
-from warnings import warn
 
 import ollama
 from ollama._types import Message, Options
-from typing import Iterator, Type, Any, Literal, List, Mapping, Sequence
+from typing import Iterator, Type, Any, Literal, Mapping, Sequence
 from pydantic import BaseModel, ValidationError
-import json
 
 from .prompt_manager import ChatPromptManager
 from .validation_manager import ValidationManager
@@ -134,7 +131,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             ```
         '''
         # logging
-        logger.debug(msg=f'def {self.chat_completion.__name__}')
+        logger.debug(msg=f"def {self.chat_completion.__name__}")
         # functionality
         self.reset_states(retries=retries)
         self.create_prompt(pydantic_model, messages, retries, format=format)
@@ -155,10 +152,11 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     options=options,
                     keep_alive=keep_alive
                 )
-                logger.debug(msg=f'Raw response: {response['message']['content']}')
+                logger.debug(msg=f"Raw response: {response['message']['content']}")
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
                 except ValidationError as e:
+                    logger.debug(msg=f"ValidationError: {e}")
                     self.retry_counter -= 1
 
             except Exception as e:
@@ -222,13 +220,38 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
             # {'name': 'Jason', 'age': 45, 'gender': 'male'}
         '''
         # logging
-        logger.debug(msg=f'def {self.chat_completion_with_stream.__name__}')
+        logger.debug(msg=f"def {self.chat_completion_with_stream.__name__}")
         # functionality
         self.reset_states(retries=retries)
         self.create_prompt(pydantic_model, messages, retries, format=format)
 
+        expanded_chunk = ''
+
+        response = self.ollama_client.chat(
+            model=model,
+            messages=messages,
+            format=format,
+            stream=True,
+            options=options,
+            keep_alive=keep_alive
+        )
+
+
+        for chunk in response:
+            expanded_chunk += chunk['message']['content']
+            chunk['message']['content'] = expanded_chunk
+
+            yield chunk
+
+        # TODO: start from here with the new logic
+
+
+
+
+
+"""
         # Start the while loop
-        while self.validation_error is not False or self.retry_counter >= 0:
+        while self.retry_counter >= 0:
             if self.validation_error is not False:
                 self.chat_history.append(self.chat_prompt_manager.error_guidance_prompt(validation_error=self.validation_error))
             expanding_response = ""
@@ -250,6 +273,7 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                     if isinstance(chunk, dict) and 'message' in chunk and isinstance(chunk['message'], dict):
                         expanding_response += chunk['message']['content']
                         chunk['message']['content'] = expanding_response
+                        rich.print(chunk['message']['content'])
 
                         # Validation block of chunks
                         chunk: Iterator[Mapping[str, Any]] = self.validation_manager.validate_chat_completion_with_stream(chunk=chunk, pydantic_model=pydantic_model)
@@ -294,6 +318,9 @@ class OllamaInstructorClient(BaseOllamaInstructorClient):
                         return chunk
             except Exception as e:
                 raise e
+"""
+
+
 
 class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
     def __init__(self, host: str = 'http://localhost:11434', debug: bool = False):
@@ -372,7 +399,7 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
         ```
         '''
         # logging
-        logger.debug(msg=f'def {self.chat_completion.__name__}')
+        logger.debug(msg=f"def {self.chat_completion.__name__}")
         # functionality
         self.reset_states(retries=retries)
         self.create_prompt(pydantic_model, messages, retries, format=format)
@@ -391,10 +418,11 @@ class OllamaInstructorAsyncClient(BaseOllamaInstructorClient):
                     options=options,
                     keep_alive=keep_alive
                 )
-                logger.debug(msg=f'Raw response: {response['message']['content']}')
+                logger.debug(msg=f"Raw response: {response['message']['content']}")
                 try:
                     return self.handle_response(response=response, pydantic_model=pydantic_model, allow_partial=allow_partial, format=format)
                 except ValidationError as e:
+                    logger.debug(msg=f"ValidationError: {e}")
                     self.retry_counter -= 1
 
             except Exception as e:

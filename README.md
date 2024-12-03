@@ -145,6 +145,7 @@ if __name__ == "__main__":
 ```
 
 **chat completion with streaming**:
+
 **(!) Currently broken due to dependency issues with new version of `ollama` (!)**
 ```python
 from ollama_instructor.ollama_instructor_client import OllamaInstructorClient

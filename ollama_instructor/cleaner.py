@@ -41,7 +41,7 @@ def create_partial_model(pydantic_model: Type[BaseModel]) -> Type[BaseModel]:
         Type[BaseModel]: The partial Pydantic model which now accepts missing fields.
     '''
     # logging
-    logger.debug(msg=f'def {create_partial_model.__name__}')
+    logger.debug(msg=f"def {create_partial_model.__name__}")
     # functionality
     def make_field_optional(field: FieldInfo) -> Tuple[Type, FieldInfo]:
         new = deepcopy(field)
@@ -78,7 +78,7 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
         Dict[str, Any]: A dictionary with the cleaned data.
     '''
     # logging
-    logger.debug(msg=f'def {clean_nested_data_with_error_dict.__name__}')
+    logger.debug(msg=f"def {clean_nested_data_with_error_dict.__name__}")
     # functionality
     if isinstance(data, str):
         data = json.loads(data)
@@ -95,7 +95,7 @@ def clean_nested_data_with_error_dict(data: Any, pydantic_model: Type[BaseModel]
             # Recursive function to navigate through the nested data structure and set values to None or remove them
             def set_nested_value(data: Any, loc: tuple, error_type: str):
                 # logging
-                logger.debug(msg=f'def {set_nested_value.__name__}')
+                logger.debug(msg=f"def {set_nested_value.__name__}")
                 # functionality
                 for key in loc[:-1]:
                     if isinstance(data, dict):

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ollama-instructor"
-version = "0.5.1"
+version = "0.5.2"
 description = "Instruct and validate structured outputs from LLMs with Ollama."
 authors = ["Lennart Pollvogt"]
 license = "MIT"
@@ -29,7 +29,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ollama = ">=0.2.0, <0.4.2"
+ollama = ">=0.2.0, <0.4.3"
 pydantic = "^2.9.0"
 partial-json-parser = "^0.2.0"
 promptools = "^0.1.3.2"
