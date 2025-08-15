@@ -61,7 +61,7 @@ class OllamaInstructor(Client, LoggingMixin):
     ) -> Iterator[ChatResponse]:
         self.logger.info(f"Starting chat stream with model: {model}")
         self.logger.debug(f"Using format schema: {format.model_json_schema()}")
-        @stamina.retry(on=(ValidationError), attempts=retries)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
         def _chat_stream(
             self,
             format: Type[BaseModel],
@@ -107,7 +107,7 @@ class OllamaInstructor(Client, LoggingMixin):
         retries: int = 3
     ) -> ChatResponse | None:
         self.logger.info(f"Starting chat completion with model: {model}")
-        @stamina.retry(on=(ValidationError), attempts=retries)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
         def _chat_completion(
             self,
             format: Type[BaseModel],
@@ -183,7 +183,7 @@ class OllamaInstructorAsync(AsyncClient, LoggingMixin):
     ) -> AsyncIterator[ChatResponse]:
         self.logger.info(f"Starting async chat stream with model: {model}")
         self.logger.debug(f"Using format schema: {format.model_json_schema()}")
-        @stamina.retry(on=(ValidationError), attempts=retries)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
         async def _chat_stream(
             self,
             format: Type[BaseModel],
@@ -228,7 +228,7 @@ class OllamaInstructorAsync(AsyncClient, LoggingMixin):
         retries: int = 3
     ) -> ChatResponse:
         self.logger.info(f"Starting chat completion with model: {model}")
-        @stamina.retry(on=(ValidationError), attempts=retries)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
         async def _chat_completion(
             self,
             format: Type[BaseModel],
