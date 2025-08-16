@@ -1,6 +1,6 @@
 [project]
 name = "ollama-instructor"
-version = "1.0.0"
+version = "1.1.0"
 description = "Validate structured outputs from LLMs with Ollama and automatic retries."
 readme = "README.md"
 authors = [
@@ -30,12 +30,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = [
-    "pytest>=8.3.4",
-    "pytest-asyncio>=0.25.0",
-    "rich>=13.9.4",
-    "ruff>=0.8.4",
-]
+dev = ["pytest>=8.3.4", "pytest-asyncio>=0.25.0", "rich>=13.9.4", "ruff>=0.8.4"]
 
 [tool.pytest.ini_options]
 markers = [

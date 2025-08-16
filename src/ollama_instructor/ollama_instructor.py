@@ -4,6 +4,7 @@ from typing import Type, Mapping, Any, Sequence, Literal
 import stamina
 import sys
 import logging
+from datetime import timedelta
 
 from ._logging import LoggingMixin
 
@@ -57,11 +58,12 @@ class OllamaInstructor(Client, LoggingMixin):
         options: Mapping[str, Any] | Options | None = None,
         keep_alive: float | str | None = None,
         *,
-        retries: int = 3
+        retries: int = 3,
+        stamina_timeout: float | timedelta | None = None
     ) -> Iterator[ChatResponse]:
         self.logger.info(f"Starting chat stream with model: {model}")
         self.logger.debug(f"Using format schema: {format.model_json_schema()}")
-        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=stamina_timeout)
         def _chat_stream(
             self,
             format: Type[BaseModel],
@@ -104,10 +106,11 @@ class OllamaInstructor(Client, LoggingMixin):
         options: Mapping[str, Any] | Options | None = None,
         keep_alive: float | str | None = None,
         *,
-        retries: int = 3
+        retries: int = 3,
+        stamina_timeout: float | timedelta | None = None
     ) -> ChatResponse | None:
         self.logger.info(f"Starting chat completion with model: {model}")
-        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=stamina_timeout)
         def _chat_completion(
             self,
             format: Type[BaseModel],
@@ -179,11 +182,12 @@ class OllamaInstructorAsync(AsyncClient, LoggingMixin):
         options: Mapping[str, Any] | Options | None = None,
         keep_alive: float | str | None = None,
         *,
-        retries: int = 3
+        retries: int = 3,
+        stamina_timeout: float | timedelta | None = None
     ) -> AsyncIterator[ChatResponse]:
         self.logger.info(f"Starting async chat stream with model: {model}")
         self.logger.debug(f"Using format schema: {format.model_json_schema()}")
-        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=stamina_timeout)
         async def _chat_stream(
             self,
             format: Type[BaseModel],
@@ -225,10 +229,11 @@ class OllamaInstructorAsync(AsyncClient, LoggingMixin):
         options: Mapping[str, Any] | Options | None = None,
         keep_alive: float | str | None = None,
         *,
-        retries: int = 3
+        retries: int = 3,
+        stamina_timeout: float | timedelta | None = None
     ) -> ChatResponse:
         self.logger.info(f"Starting chat completion with model: {model}")
-        @stamina.retry(on=(ValidationError), attempts=retries, timeout=None)
+        @stamina.retry(on=(ValidationError), attempts=retries, timeout=stamina_timeout)
         async def _chat_completion(
             self,
             format: Type[BaseModel],
